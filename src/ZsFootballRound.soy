@@ -1,0 +1,40 @@
+{namespace ZsFootballRound}
+
+/**
+ * This renders the main element.
+ * @param? elementClasses
+ * @param round
+ * @param matches
+ * @param roundDay
+ */
+{template .render}
+	<table class="table zsfootball-round{$elementClasses ? ' ' + $elementClasses : ''}">
+		{let $competition: $round.competitionId /}
+		{let $season: $round.competitionId.seasonId /}
+		<caption>
+			{$season.title} {$competition.title} {if not $roundDay}Round:{$round.num}{/if}{if $roundDay}{$roundDay.localeDateString}{/if}
+		</caption>
+		<tbody>
+			{foreach $match in $matches}
+				{call .renderRowView_}
+					{param match: $match /}
+					{param viewType: 1 /}
+				{/call}
+			{/foreach} 
+		</tbody>
+	</table>
+{/template}
+
+/**
+ * @param? elementClasses
+ * @param match
+ */
+{template .renderRowView_}
+	<tr class="zsfootball-match{$elementClasses ? ' ' + $elementClasses : ''}">
+		<td class="match-date">{$match.localHourMinute}</td>
+		<td class="home-club">{$match.homeClub}</td>
+		<td class="result">{$match.homeGoals} - {$match.awayGoals}</td>
+		<td class="away-club">{$match.awayClub}</td>
+		<td class="attendance">{$match.attendance}</td>
+	</tr>
+{/template}
