@@ -1,0 +1,39 @@
+{
+  "name": "zsfootball-round",
+  "version": "0.0.1",
+  "description": "A round component to group matches",
+  "license": "BSD",
+  "repository": "zsagia/zsfootball-round",
+  "engines": {
+    "node": ">=0.12.0",
+    "npm": ">=3.0.0"
+  },
+  "main": "lib/ZsFootballRound.js",
+  "browser": "src/ZsFootballRound.js",
+  "files": [
+    "lib",
+    "src",
+    "test"
+  ],
+  "scripts": {
+    "compile": "babel --presets es2015 -d lib/ src/",
+    "publish": "npm run compile",
+    "test": "gulp test"
+  },
+  "keywords": [
+    "metal zsfootball round"
+  ],
+  "dependencies": {
+    "bootstrap": "^3.3.6",
+    "metal-component": "metal/metal-component#master",
+    "metal-list": "^1.0.0-rc.2",
+    "metal-soy": "metal/metal-soy#master",
+    "zsfootball-models": "^0.2.2"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.4.5",
+    "babel-preset-es2015": "^6.3.13",
+    "gulp": "^3.8.11",
+    "gulp-metal": "^1.0.0"
+  }
+}
