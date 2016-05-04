@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Demo: ZsFootballRound</title>
+
+	<link rel="stylesheet" href="../node_modules/bootstrap/dist/css/bootstrap.css">
+	<link rel="stylesheet" href="../build/zsFootballRound.css">
+
+	<script src="../build/globals/zsFootballRound.js"></script>
+	<style>
+		table {
+			margin: auto;
+			width: 50% !important;
+		}
+	</style>
+</head>
+<body>
+	<h1>ZsFootballRound Round View</h1>
+	<script type="text/javascript">
+		new metal.ZsFootballRound({
+			elementClasses: 'table-striped table-bordered',
+			round: {
+				id: 301,
+				competitionId: {
+					id: 201,
+					sportId: 100,
+					seasonId: {id: 80001, title: '2015-16'},
+					title: 'Barclays Premier League'
+				},
+				num: 1
+			},
+			matches: [
+				{
+					id: 7101,
+					attendance: 75261,
+					awayClub: 'Tottenham Hotspurs',
+					awayGoals: 0,
+					homeClub: 'Manchester United',
+					homeGoals: 1,
+					matchDate: 1439041500000,
+					round: 1,
+					venue: {id: 6001},
+					type: {id: 1001, name: 'Premiere League'}
+				},
+				{
+					id: 7102,
+					attendance:  11155,
+					awayClub: 'Aston Villa',
+					awayGoals: 1,
+					homeClub: 'AFC Bournemouth',
+					homeGoals: 0,
+					matchDate: 1439046000000,
+					round: 1,
+					venue: {id: 6004},
+					type: {id: 1001, name: 'Premiere League'}
+				},
+				{
+					id: 7103,
+					attendance: 27036,
+					awayClub: 'Crystal Palace',
+					awayGoals: 3,
+					homeClub: 'Norwich City',
+					homeGoals: 1,
+					matchDate: 1439046000000,
+					round: 1,
+					referee: 'Simon Hooper',
+					venue: {id: 6012},
+					type: {id: 1001, name: 'Premiere League'}
+				},
+				{
+					id: 7104,
+					attendance: 39063,
+					awayClub: 'Watford FC',
+					awayGoals: 2,
+					homeClub: 'Everton',
+					homeGoals: 2,
+					matchDate: 1439046000000,
+					round: 1,
+					referee: 'Mike Jones',
+					venue: 6007,
+					type: {id: 1001, name: 'Premiere League'}
+				},
+				{
+					id: 7105,
+					attendance: 32242,
+					awayClub: 'Sunderland AFC',
+					awayGoals: 2,
+					homeClub: 'Leicester City',
+					homeGoals: 4,
+					matchDate: 1439046000000,
+					round: 1,
+					referee: 'Lee Mason',
+					venue: 6008,
+					type: {id: 1001, name: 'Premiere League'}
+				},
+				{
+					id: 7106,
+					attendance: 41232,
+					awayClub: 'Swansea City',
+					awayGoals: 2,
+					homeClub: 'Chelsea FC',
+					homeGoals: 2,
+					matchDate: 1439055000000,
+					round: 1,
+					referee: 'Michael Oliver',
+					venue: 6005,
+					type: {id: 1001, name: 'Premiere League'}
+				}
+			]
+		});
+	</script>
+
+		<h1>ZsFootballRound RoundDay View</h1>
+	<script>
+		new metal.ZsFootballRound({
+			elementClasses: 'table-striped table-bordered',
+			round: {
+				id: 301,
+				competitionId: {
+					id: 201,
+					sportId: 100,
+					seasonId: {id: 80001, title: '2015-16'},
+					title: 'Barclays Premier League'
+				},
+				num: 2
+			},
+			matches: [
+				{
+					id: 7111,
+					attendance: 42200,
+					awayClub: 'Manchester United',
+					awayGoals: 1,
+					homeClub: 'Aston Villa',
+					homeGoals: 0,
+					matchDate: 1439581500000,
+					round: 2,
+					referee: 'Mike Dean',
+					venue: 6003,
+					type: {id: 1001, name: 'Premiere League'}
+				}
+			],
+			roundDay: new Date(1439581500000)
+		});
+
+		new metal.ZsFootballRound({
+			elementClasses: 'table-striped table-bordered',
+			round: {
+				id: 301,
+				competitionId: {
+					id: 201,
+					sportId: 100,
+					seasonId: {id: 80001, title: '2015-16'},
+					title: 'Barclays Premier League'
+				},
+				num: 2
+			},
+			matches: [
+				{
+					id: 7112,
+					attendance: 36004,
+					awayClub: 'Stoke City',
+					awayGoals: 2,
+					homeClub: 'Tottenham Hotspurs',
+					homeGoals: 2,
+					matchDate: 1439650800000,
+					round: 2,
+					referee: 'Robert Madley',
+					venue: 6017,
+					type: {id: 1001, name: 'Premiere League'}
+				},
+				{
+					id: 7113,
+					attendance: 41379,
+					awayClub: 'Norwich City',
+					awayGoals: 3,
+					homeClub: 'Sunderland AFC',
+					homeGoals: 1,
+					matchDate: 1439650800000,
+					round: 2,
+					referee: 'Kevin Friend',
+					venue: 6015,
+					type: {id: 1001, name: 'Premiere League'}
+				},
+				{
+					id: 7114,
+					attendance: 20678,
+					awayClub: 'Newcastle United',
+					awayGoals: 0,
+					homeClub: 'Swansea City',
+					homeGoals: 2,
+					matchDate: 1439650800000,
+					round: 2,
+					referee: 'Mike Jones',
+					venue: 6016,
+					type: {id: 1001, name: 'Premiere League'}
+				},
+				{
+					id: 7115,
+					attendance: 34857,
+					awayClub: 'Leicester City',
+					awayGoals: 2,
+					homeClub: 'West Ham',
+					homeGoals: 1,
+					matchDate: 1439650800000,
+					round: 2,
+					referee: 'Anthony Taylor',
+					venue: 6020,
+					type: {id: 1001, name: 'Premiere League'}
+				},
+				{
+					id: 7116,
+					attendance: 20011,
+					awayClub: 'West Brom',
+					awayGoals: 0,
+					homeClub: 'Watford FC',
+					homeGoals: 0,
+					matchDate: 1439650800000,
+					round: 2,
+					referee: 'Paul Tierney',
+					venue: 6018,
+					type: {id: 1001, name: 'Premiere League'}
+				},
+				{
+					id: 7117,
+					attendance: 30966,
+					awayClub: 'Everton',
+					awayGoals: 3,
+					homeClub: 'Southampton',
+					homeGoals: 0,
+					matchDate: 1439642700000,
+					round: 2,
+					referee: 'Michael Oliver',
+					venue: 6013,
+					type: {id: 1001, name: 'Premiere League'}
+				},
+
+			],
+			roundDay: new Date(1439650800000)
+		});
+
+		new metal.ZsFootballRound({
+			elementClasses: 'table-striped table-bordered',
+			round: {
+				id: 301,
+				competitionId: {
+					id: 201,
+					sportId: 100,
+					seasonId: {id: 80001, title: '2015-16'},
+					title: 'Barclays Premier League'
+				},
+				num: 2
+			},
+			matches: [
+				{
+					id: 7118,
+					attendance: 54331,
+					awayClub: 'Chelsea FC',
+					awayGoals: 0,
+					homeClub: 'Manchester City',
+					homeGoals: 3,
+					matchDate: 1439740800000,
+					round: 2
+				},
+				{
+					id: 7119,
+					attendance: 24732,
+					awayClub: 'Arsenal',
+					awayGoals: 2,
+					homeClub: 'Crystal Palace',
+					homeGoals: 1,
+					matchDate: 1439731800000,
+					round: 2
+				}
+
+			],
+			roundDay: new Date(1439740800000)
+		});
+
+		new metal.ZsFootballRound({
+			elementClasses: 'table-striped table-bordered',
+			round: {
+				id: 301,
+				competitionId: {
+					id: 201,
+					sportId: 100,
+					seasonId: {id: 80001, title: '2015-16'},
+					title: 'Barclays Premier League'
+				},
+				num: 2
+			},
+			matches: [
+				{
+					id: 7120,
+					attendance: 44102,
+					awayClub: 'AFC Bournemouth',
+					awayGoals: 0,
+					homeClub: 'Liverpool FC',
+					homeGoals: 1,
+					matchDate: 1439841600000,
+					round: 2
+				}
+			],
+			roundDay: new Date(1439841600000)
+		});
+	</script>
+</body>
+</html>
