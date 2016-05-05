@@ -5,14 +5,17 @@
 	}
 	.zsfootball-match {
 		.away-club {
+			font-weight: bold;
 			text-align: left;
 			width: 40%;
 		}
 		.home-club {
+			font-weight: bold;
 			text-align: right;
 			width:40%;
 		}
 		.result {
+			font-weight: inherit;
 			text-align: center;
 			width: 10%;
 		}
