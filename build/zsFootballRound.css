@@ -1,0 +1,21 @@
+.zsfootball-round caption {
+  font-weight: bold;
+  font-size: 14px; }
+
+.zsfootball-round .zsfootball-match .away-club {
+  font-weight: bold;
+  text-align: left;
+  width: 40%; }
+
+.zsfootball-round .zsfootball-match .home-club {
+  font-weight: bold;
+  text-align: right;
+  width: 40%; }
+
+.zsfootball-round .zsfootball-match .result {
+  font-weight: inherit;
+  text-align: center;
+  width: 10%; }
+
+.zsfootball-round .zsfootball-match match-date {
+  width: 10%; }
