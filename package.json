@@ -1,6 +1,6 @@
 {
   "name": "zsfootball-round",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "A round component to group matches",
   "license": "BSD",
   "repository": "zsagia/zsfootball-round",
