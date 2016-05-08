@@ -45,24 +45,33 @@ function $render(opt_data, opt_ignored, opt_ijData) {
     var competition__soy6 = opt_data.round.competitionId;
     var season__soy7 = opt_data.round.competitionId.seasonId;
     ie_open('caption');
-      itext((goog.asserts.assert((season__soy7.title) != null), season__soy7.title));
-      itext(' ');
-      itext((goog.asserts.assert((competition__soy6.title) != null), competition__soy6.title));
-      itext(' ');
+      ie_open('span');
+        itext((goog.asserts.assert((competition__soy6.country) != null), competition__soy6.country));
+      ie_close('span');
+      ie_open('span');
+        itext((goog.asserts.assert((season__soy7.title) != null), season__soy7.title));
+      ie_close('span');
+      ie_open('span');
+        itext((goog.asserts.assert((competition__soy6.title) != null), competition__soy6.title));
+      ie_close('span');
       if (! opt_data.roundDay) {
-        itext('Round:');
-        itext((goog.asserts.assert((opt_data.round.num) != null), opt_data.round.num));
+        ie_open('span');
+          itext('Round:');
+          itext((goog.asserts.assert((opt_data.round.num) != null), opt_data.round.num));
+        ie_close('span');
       }
       if (opt_data.roundDay) {
-        itext((goog.asserts.assert((opt_data.roundDay.localeDateString) != null), opt_data.roundDay.localeDateString));
+        ie_open('span');
+          itext((goog.asserts.assert((opt_data.roundDay.localeDateString) != null), opt_data.roundDay.localeDateString));
+        ie_close('span');
       }
     ie_close('caption');
     ie_open('tbody');
-      var matchList24 = opt_data.matches;
-      var matchListLen24 = matchList24.length;
-      for (var matchIndex24 = 0; matchIndex24 < matchListLen24; matchIndex24++) {
-        var matchData24 = matchList24[matchIndex24];
-        $renderRowView_({match: matchData24, viewType: 1}, null, opt_ijData);
+      var matchList29 = opt_data.matches;
+      var matchListLen29 = matchList29.length;
+      for (var matchIndex29 = 0; matchIndex29 < matchListLen29; matchIndex29++) {
+        var matchData29 = matchList29[matchIndex29];
+        $renderRowView_({match: matchData29, viewType: 1}, null, opt_ijData);
       }
     ie_close('tbody');
   ie_close('table');
