@@ -9,8 +9,8 @@
  */
 {template .render}
 	<table class="table zsfootball-round{$elementClasses ? ' ' + $elementClasses : ''}">
-		{let $competition: $round.competitionId /}
-		{let $season: $round.competitionId.seasonId /}
+		{let $competition: $round.competition /}
+		{let $season: $round.competition.seasonId /}
 		<caption>
 			<span>{$competition.country}</span>
 			<span>{$season.title}</span>

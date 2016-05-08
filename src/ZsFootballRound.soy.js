@@ -42,8 +42,8 @@ var iattr = IncrementalDom.attr;
 function $render(opt_data, opt_ignored, opt_ijData) {
   ie_open('table', null, null,
       'class', 'table zsfootball-round' + (opt_data.elementClasses ? ' ' + opt_data.elementClasses : ''));
-    var competition__soy6 = opt_data.round.competitionId;
-    var season__soy7 = opt_data.round.competitionId.seasonId;
+    var competition__soy6 = opt_data.round.competition;
+    var season__soy7 = opt_data.round.competition.seasonId;
     ie_open('caption');
       ie_open('span');
         itext((goog.asserts.assert((competition__soy6.country) != null), competition__soy6.country));
