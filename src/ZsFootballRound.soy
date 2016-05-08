@@ -12,7 +12,11 @@
 		{let $competition: $round.competitionId /}
 		{let $season: $round.competitionId.seasonId /}
 		<caption>
-			{$season.title} {$competition.title} {if not $roundDay}Round:{$round.num}{/if}{if $roundDay}{$roundDay.localeDateString}{/if}
+			<span>{$competition.country}</span>
+			<span>{$season.title}</span>
+			<span>{$competition.title}</span>
+			{if not $roundDay}<span>Round:{$round.num}</span>{/if}
+			{if $roundDay}<span>{$roundDay.localeDateString}</span>{/if}
 		</caption>
 		<tbody>
 			{foreach $match in $matches}

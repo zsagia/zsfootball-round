@@ -1,6 +1,8 @@
 .zsfootball-round caption {
   font-weight: bold;
   font-size: 14px; }
+  .zsfootball-round caption span {
+    padding-right: 10px; }
 
 .zsfootball-round .zsfootball-match .away-club {
   font-weight: bold;
