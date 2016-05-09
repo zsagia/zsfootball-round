@@ -11699,7 +11699,144 @@ babelHelpers;
 'use strict';
 
 (function () {
+	var Storage = function () {
+		function Storage(type) {
+			babelHelpers.classCallCheck(this, Storage);
+
+			this.storage;
+
+			switch (type) {
+				case Storage.TYPE.LOCAL:
+					this.storage = window.localStorage || {};
+					break;
+				case Storage.TYPE.SESSION:
+					this.storage = window.sessionStorage || {};
+					break;
+			}
+		}
+
+		Storage.prototype.getItem = function getItem(key) {
+			return this.storage[key];
+		};
+
+		Storage.prototype.getJSONItem = function getJSONItem(key) {
+			return JSON.parse(this.getItem(key));
+		};
+
+		Storage.prototype.setItem = function setItem(key, string) {
+			this.storage[key] = string;
+		};
+
+		Storage.prototype.setJSONItem = function setJSONItem(key, object) {
+			this.setItem(key, JSON.stringify(object));
+		};
+
+		Storage.prototype.deleteItem = function deleteItem(key) {
+			delete this.storage[key];
+		};
+
+		Storage.prototype.clear = function clear() {
+			Object.keys(this.storage).forEach(this.deleteItem, this);
+		};
+
+		return Storage;
+	}();
+
+	;
+
+	Storage.TYPE = {
+		LOCAL: 'local',
+		SESSION: 'session'
+	};
+
+	this.metal.Storage = Storage;
+}).call(this);
+'use strict';
+
+(function () {
+	var core = this.metalNamed.metal.core;
+	var object = this.metalNamed.metal.object;
+	var Storage = this.metal.Storage;
+
+	var ModelUtil = function () {
+		function ModelUtil() {
+			babelHelpers.classCallCheck(this, ModelUtil);
+		}
+
+		/**
+   * Returns an Object if value isObject
+   * @param {number or Object} value
+   * @return {Object or undefined}
+   */
+
+		ModelUtil.getObject = function getObject(value) {
+			var competition;
+
+			if (core.isObject(value)) {
+				ModelUtil.localStorage.setJSONItem(value.id.toString(), value);
+
+				competition = value;
+			} else if (core.isNumber(value)) {
+				var object = ModelUtil.localStorage.getJSONItem(value.toString());
+
+				if (object) {
+					competition = object;
+				}
+			}
+
+			return competition;
+		};
+
+		return ModelUtil;
+	}();
+
+	;
+
+	ModelUtil.localStorage = new Storage(Storage.TYPE.LOCAL);
+
+	this.metal.ModelUtil = ModelUtil;
+}).call(this);
+'use strict';
+
+(function () {
 	var Model = this.metal.Model;
+
+	var Season = function (_Model) {
+		babelHelpers.inherits(Season, _Model);
+
+		function Season() {
+			babelHelpers.classCallCheck(this, Season);
+			return babelHelpers.possibleConstructorReturn(this, _Model.apply(this, arguments));
+		}
+
+		return Season;
+	}(Model);
+
+	Season.STATE = {
+		/**
+   *
+   */
+		end: {},
+
+		/**
+   *
+   */
+		start: {},
+
+		/**
+   *
+   */
+		title: {}
+	};
+
+	this.metal.Season = Season;
+}).call(this);
+'use strict';
+
+(function () {
+	var Model = this.metal.Model;
+	var ModelUtil = this.metal.ModelUtil;
+	var Season = this.metal.Season;
 
 	var Competition = function (_Model) {
 		babelHelpers.inherits(Competition, _Model);
@@ -11708,6 +11845,41 @@ babelHelpers;
 			babelHelpers.classCallCheck(this, Competition);
 			return babelHelpers.possibleConstructorReturn(this, _Model.apply(this, arguments));
 		}
+
+		/**
+   *
+   */
+
+		Competition.prototype.setSeason_ = function setSeason_(value) {
+			var object = ModelUtil.getObject(value);
+			var season;
+
+			if (object) {
+				season = new Season(object);
+
+				this.seasonId = season.id;
+			}
+
+			return season;
+		};
+
+		/**
+   *
+   */
+
+
+		Competition.prototype.setSport_ = function setSport_(value) {
+			var object = ModelUtil.getObject(value);
+			var sport;
+
+			if (object) {
+				sport = new Sport(object);
+
+				this.sportId = sport.id;
+			}
+
+			return sport;
+		};
 
 		return Competition;
 	}(Model);
@@ -11721,12 +11893,16 @@ babelHelpers;
 		/**
    *
    */
-		seasonId: {},
+		season: {
+			setter: 'setSeason_'
+		},
 
 		/**
    *
    */
-		sportId: {},
+		sport: {
+			setter: 'setSport_'
+		},
 
 		/**
    *
@@ -11992,110 +12168,6 @@ babelHelpers;
 'use strict';
 
 (function () {
-	var Storage = function () {
-		function Storage(type) {
-			babelHelpers.classCallCheck(this, Storage);
-
-			this.storage;
-
-			switch (type) {
-				case Storage.TYPE.LOCAL:
-					this.storage = window.localStorage || {};
-					break;
-				case Storage.TYPE.SESSION:
-					this.storage = window.sessionStorage || {};
-					break;
-			}
-		}
-
-		Storage.prototype.getItem = function getItem(key) {
-			return this.storage[key];
-		};
-
-		Storage.prototype.getJSONItem = function getJSONItem(key) {
-			return JSON.parse(this.getItem(key));
-		};
-
-		Storage.prototype.setItem = function setItem(key, string) {
-			this.storage[key] = string;
-		};
-
-		Storage.prototype.setJSONItem = function setJSONItem(key, object) {
-			this.setItem(key, JSON.stringify(object));
-		};
-
-		Storage.prototype.deleteItem = function deleteItem(key) {
-			delete this.storage[key];
-		};
-
-		Storage.prototype.clear = function clear() {
-			Object.keys(this.storage).forEach(this.deleteItem, this);
-		};
-
-		return Storage;
-	}();
-
-	;
-
-	Storage.TYPE = {
-		LOCAL: 'local',
-		SESSION: 'session'
-	};
-
-	var localStorage = new Storage(Storage.TYPE.LOCAL);
-	var sessionStorage = new Storage(Storage.TYPE.SESSION);
-
-	this.metal.Storage = Storage;
-	this.metalNamed.Storage = this.metalNamed.Storage || {};
-	this.metalNamed.Storage.localStorage = localStorage;
-	this.metalNamed.Storage.sessionStorage = sessionStorage;
-}).call(this);
-'use strict';
-
-(function () {
-	var core = this.metalNamed.metal.core;
-	var object = this.metalNamed.metal.object;
-	var localStorage = this.metalNamed.Storage.localStorage;
-
-	var ModelUtil = function () {
-		function ModelUtil() {
-			babelHelpers.classCallCheck(this, ModelUtil);
-		}
-
-		/**
-   * Returns an Object if value isObject
-   * @param {number or Object} value
-   * @return {Object or undefined}
-   */
-
-		ModelUtil.getObject = function getObject(value) {
-			var competition;
-
-			if (core.isObject(value)) {
-				localStorage.setJSONItem(value.id.toString(), value);
-
-				competition = value;
-			} else if (core.isNumber(value)) {
-				var object = localStorage.getJSONItem(value.toString());
-
-				if (object) {
-					competition = object;
-				}
-			}
-
-			return competition;
-		};
-
-		return ModelUtil;
-	}();
-
-	;
-
-	this.metal.ModelUtil = ModelUtil;
-}).call(this);
-'use strict';
-
-(function () {
 	var Competition = this.metal.Competition;
 	var Model = this.metal.Model;
 	var ModelUtil = this.metal.ModelUtil;
@@ -12143,41 +12215,6 @@ babelHelpers;
 	};
 
 	this.metal.Round = Round;
-}).call(this);
-'use strict';
-
-(function () {
-	var Model = this.metal.Model;
-
-	var Season = function (_Model) {
-		babelHelpers.inherits(Season, _Model);
-
-		function Season() {
-			babelHelpers.classCallCheck(this, Season);
-			return babelHelpers.possibleConstructorReturn(this, _Model.apply(this, arguments));
-		}
-
-		return Season;
-	}(Model);
-
-	Season.STATE = {
-		/**
-   *
-   */
-		end: {},
-
-		/**
-   *
-   */
-		start: {},
-
-		/**
-   *
-   */
-		title: {}
-	};
-
-	this.metal.Season = Season;
 }).call(this);
 'use strict';
 
@@ -12369,7 +12406,7 @@ babelHelpers;
     function $render(opt_data, opt_ignored, opt_ijData) {
       ie_open('table', null, null, 'class', 'table zsfootball-round' + (opt_data.elementClasses ? ' ' + opt_data.elementClasses : ''));
       var competition__soy6 = opt_data.round.competition;
-      var season__soy7 = opt_data.round.competition.seasonId;
+      var season__soy7 = opt_data.round.competition.season;
       ie_open('caption');
       ie_open('span');
       itext((goog.asserts.assert(competition__soy6.country != null), competition__soy6.country));

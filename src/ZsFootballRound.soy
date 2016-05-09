@@ -10,7 +10,7 @@
 {template .render}
 	<table class="table zsfootball-round{$elementClasses ? ' ' + $elementClasses : ''}">
 		{let $competition: $round.competition /}
-		{let $season: $round.competition.seasonId /}
+		{let $season: $round.competition.season /}
 		<caption>
 			<span>{$competition.country}</span>
 			<span>{$season.title}</span>
