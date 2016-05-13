@@ -1464,6 +1464,15 @@ babelHelpers;
 			_this.originEmitter_ = originEmitter;
 
 			/**
+    * A list of events that are pending to be listened by an actual origin
+    * emitter. Events are stored here when the origin doesn't exist, so they
+    * can be set on a new origin when one is set.
+    * @type {!Array}
+    * @protected
+    */
+			_this.pendingEvents_ = [];
+
+			/**
     * Holds a map of events from the origin emitter that are already being proxied.
     * @type {Object<string, !EventHandle>}
     * @protected
@@ -1546,7 +1555,7 @@ babelHelpers;
 
 		EventEmitterProxy.prototype.proxyEvent = function proxyEvent(event) {
 			if (this.shouldProxyEvent_(event)) {
-				this.proxiedEvents_[event] = this.addListenerForEvent_(event);
+				this.tryToAddListener_(event);
 			}
 		};
 
@@ -1562,24 +1571,26 @@ babelHelpers;
 				this.proxiedEvents_[events[i]].removeListener();
 			}
 			this.proxiedEvents_ = {};
+			this.pendingEvents_ = [];
 		};
 
 		/**
    * Changes the origin emitter. This automatically detaches any events that
    * were already being proxied from the previous emitter, and starts proxying
    * them on the new emitter instead.
+   * @param {!EventEmitter} originEmitter
    */
 
 
 		EventEmitterProxy.prototype.setOriginEmitter = function setOriginEmitter(originEmitter) {
-			var handles = this.proxiedEvents_;
+			var _this2 = this;
+
+			var events = this.originEmitter_ ? Object.keys(this.proxiedEvents_) : this.pendingEvents_;
 			this.removeListeners_();
 			this.originEmitter_ = originEmitter;
-
-			var events = Object.keys(handles);
-			for (var i = 0; i < events.length; i++) {
-				this.proxiedEvents_[events[i]] = this.addListenerForEvent_(events[i]);
-			}
+			events.forEach(function (event) {
+				return _this2.proxyEvent(event);
+			});
 		};
 
 		/**
@@ -1608,6 +1619,22 @@ babelHelpers;
 
 		EventEmitterProxy.prototype.startProxy_ = function startProxy_() {
 			this.targetEmitter_.on('newListener', this.proxyEvent.bind(this));
+		};
+
+		/**
+   * Adds a listener to the origin emitter, if it exists. Otherwise, stores
+   * the pending listener so it can be used on a future origin emitter.
+   * @param {string} event
+   * @protected
+   */
+
+
+		EventEmitterProxy.prototype.tryToAddListener_ = function tryToAddListener_(event) {
+			if (this.originEmitter_) {
+				this.proxiedEvents_[event] = this.addListenerForEvent_(event);
+			} else {
+				this.pendingEvents_.push(event);
+			}
 		};
 
 		return EventEmitterProxy;
@@ -1929,7 +1956,7 @@ babelHelpers;
 
 
 		dom.enterDocument = function enterDocument(node) {
-			dom.append(document.body, node);
+			node && dom.append(document.body, node);
 		};
 
 		/**
@@ -1939,7 +1966,7 @@ babelHelpers;
 
 
 		dom.exitDocument = function exitDocument(node) {
-			if (node.parentNode) {
+			if (node && node.parentNode) {
 				node.parentNode.removeChild(node);
 			}
 		};
@@ -2464,6 +2491,9 @@ babelHelpers;
 
 
 		DomEventEmitterProxy.prototype.isSupportedDomEvent_ = function isSupportedDomEvent_(event) {
+			if (!this.originEmitter_ || !this.originEmitter_.addEventListener) {
+				return true;
+			}
 			return event.startsWith('delegate:') && event.indexOf(':', 9) !== -1 || dom.supportsEvent(this.originEmitter_, event);
 		};
 
@@ -2477,7 +2507,7 @@ babelHelpers;
 
 
 		DomEventEmitterProxy.prototype.shouldProxyEvent_ = function shouldProxyEvent_(event) {
-			return _EventEmitterProxy.prototype.shouldProxyEvent_.call(this, event) && (!this.originEmitter_.addEventListener || this.isSupportedDomEvent_(event));
+			return _EventEmitterProxy.prototype.shouldProxyEvent_.call(this, event) && this.isSupportedDomEvent_(event);
 		};
 
 		return DomEventEmitterProxy;
@@ -3909,13 +3939,13 @@ babelHelpers;
 
 
 		Component.prototype.attach = function attach(opt_parentElement, opt_siblingElement) {
-			if (!this.element) {
-				throw new Error(Component.Error.ELEMENT_NOT_CREATED);
-			}
 			if (!this.inDocument) {
 				this.renderElement_(opt_parentElement, opt_siblingElement);
 				this.inDocument = true;
-				this.emit('attached');
+				this.emit('attached', {
+					parent: opt_parentElement,
+					sibling: opt_siblingElement
+				});
 				this.attached();
 			}
 			return this;
@@ -3942,11 +3972,18 @@ babelHelpers;
 
 
 		Component.prototype.addSubComponent = function addSubComponent(key, componentNameOrCtor, opt_data) {
-			if (!this.components[key]) {
-				var ConstructorFn = componentNameOrCtor;
-				if (core.isString(ConstructorFn)) {
-					ConstructorFn = ComponentRegistry.getConstructor(componentNameOrCtor);
-				}
+			var ConstructorFn = componentNameOrCtor;
+			if (core.isString(ConstructorFn)) {
+				ConstructorFn = ComponentRegistry.getConstructor(componentNameOrCtor);
+			}
+
+			var component = this.components[key];
+			if (component && component.constructor !== ConstructorFn) {
+				component.dispose();
+				component = null;
+			}
+
+			if (!component) {
 				this.components[key] = new ConstructorFn(opt_data, false);
 			}
 			return this.components[key];
@@ -3998,7 +4035,7 @@ babelHelpers;
 
 		Component.prototype.detach = function detach() {
 			if (this.inDocument) {
-				if (this.element.parentNode) {
+				if (this.element && this.element.parentNode) {
 					this.element.parentNode.removeChild(this.element);
 				}
 				this.inDocument = false;
@@ -4272,7 +4309,7 @@ babelHelpers;
 
 		Component.prototype.renderElement_ = function renderElement_(opt_parentElement, opt_siblingElement) {
 			var element = this.element;
-			if (opt_siblingElement || !element.parentNode) {
+			if (element && (opt_siblingElement || !element.parentNode)) {
 				var parent = dom.toElement(opt_parentElement) || this.DEFAULT_ELEMENT_PARENT;
 				parent.insertBefore(element, dom.toElement(opt_siblingElement));
 			}
@@ -4288,7 +4325,11 @@ babelHelpers;
 
 
 		Component.prototype.setterElementFn_ = function setterElementFn_(newVal, currentVal) {
-			return dom.toElement(newVal) || currentVal;
+			var element = newVal;
+			if (element) {
+				element = dom.toElement(newVal) || currentVal;
+			}
+			return element;
 		};
 
 		/**
@@ -4390,14 +4431,14 @@ babelHelpers;
 
 		/**
    * Validator logic for element state key.
-   * @param {string|Element} val
+   * @param {?string|Element} val
    * @return {boolean} True if val is a valid element.
    * @protected
    */
 
 
 		Component.prototype.validatorElementFn_ = function validatorElementFn_(val) {
-			return core.isElement(val) || core.isString(val);
+			return core.isElement(val) || core.isString(val) || !core.isDefAndNotNull(val);
 		};
 
 		/**
@@ -4478,17 +4519,6 @@ babelHelpers;
   * @static
   */
 	Component.RENDERER = ComponentRenderer;
-
-	/**
-  * Errors thrown by the component.
-  * @enum {string}
-  */
-	Component.Error = {
-		/**
-   * Error when the component is attached but its element hasn't been created yet.
-   */
-		ELEMENT_NOT_CREATED: 'Can\'t attach component element. It hasn\'t been created yet.'
-	};
 
 	/**
   * A list with state key names that will automatically be rejected as invalid.
@@ -5885,7 +5915,9 @@ babelHelpers;
 			comp.context = {};
 			_this.changes_ = {};
 			_this.eventsCollector_ = new EventsCollector(comp);
+			_this.lastElementCreationCall_ = [];
 			comp.on('stateKeyChanged', _this.handleStateKeyChanged_.bind(_this));
+			comp.on('attached', _this.handleAttached_.bind(_this));
 			comp.on('detached', _this.handleDetached_.bind(_this));
 
 			// Binds functions that will be used many times, to avoid creating new
@@ -5949,15 +5981,33 @@ babelHelpers;
 			if (calls.length === 0) {
 				return emptyChildrenFn_;
 			}
+			var prefix = this.buildKey_();
 			var fn = function fn() {
+				var prevPrefix = _this2.currentPrefix_;
+				_this2.generatedKeyCount_[prefix] = 0;
+				_this2.currentPrefix_ = prefix;
 				_this2.intercept_();
 				for (var i = 0; i < calls.length; i++) {
 					IncrementalDOM[calls[i].name].apply(null, array.slice(calls[i].args, 1));
 				}
 				IncrementalDomAop.stopInterception();
+				_this2.currentPrefix_ = prevPrefix;
 			};
 			fn.iDomCalls = calls;
 			return fn;
+		};
+
+		/**
+   * Builds the key for the next component that is found.
+   * @return {string}
+   * @protected
+   */
+
+
+		IncrementalDomRenderer.prototype.buildKey_ = function buildKey_() {
+			var count = this.generatedKeyCount_[this.currentPrefix_] || 0;
+			this.generatedKeyCount_[this.currentPrefix_] = count + 1;
+			return this.currentPrefix_ + 'sub' + count;
 		};
 
 		/**
@@ -6036,6 +6086,17 @@ babelHelpers;
 		};
 
 		/**
+   * Handles the `attached` listener. Stores attach data.
+   * @param {!Object} data
+   * @protected
+   */
+
+
+		IncrementalDomRenderer.prototype.handleAttached_ = function handleAttached_(data) {
+			this.attachData_ = data;
+		};
+
+		/**
    * Handles the `detached` listener. Removes all inline listeners.
    * @protected
    */
@@ -6065,14 +6126,29 @@ babelHelpers;
 				if (core.isFunction(value)) {
 					dom.on(element, eventName, value);
 				}
-			} else if (name === 'checked') {
+			}
+
+			if (name === 'checked') {
 				// This is a temporary fix to account for incremental dom setting
 				// "checked" as an attribute only, which can cause bugs since that won't
 				// necessarily check/uncheck the element it's set on. See
 				// https://github.com/google/incremental-dom/issues/198 for more details.
-				element.checked = core.isDefAndNotNull(value) && value !== false;
+				value = core.isDefAndNotNull(value) && value !== false;
 			}
-			originalFn(element, name, value);
+
+			if (core.isBoolean(value)) {
+				// Incremental dom sets boolean values as string data attributes, which
+				// is counter intuitive. This changes the behavior to use the actual
+				// boolean value.
+				element[name] = value;
+				if (value) {
+					element.setAttribute(name, '');
+				} else {
+					element.removeAttribute(name);
+				}
+			} else {
+				originalFn(element, name, value);
+			}
 		};
 
 		/**
@@ -6094,9 +6170,7 @@ babelHelpers;
 				config.children = this.buildChildrenFn_(calls);
 				this.componentToRender_ = null;
 				IncrementalDomAop.stopInterception();
-				var comp = this.renderSubComponent_(tag, config);
-				this.updateElementIfNotReached_(comp);
-				return comp.element;
+				return this.renderFromTag_(tag, config);
 			}
 			this.componentToRender_.calls.push({
 				name: 'elementClose',
@@ -6170,9 +6244,13 @@ babelHelpers;
 			var attrsArr = array.slice(arguments, 4);
 			this.addInlineListeners_((statics || []).concat(attrsArr));
 			var args = array.slice(arguments, 1);
-			if (!this.rootElementReached_ && this.component_.config.key) {
-				args[1] = this.component_.config.key;
+
+			var currComp = IncrementalDomRenderer.getComponentBeingRendered();
+			var currRenderer = currComp.getRenderer();
+			if (!currRenderer.rootElementReached_ && currComp.config.key) {
+				args[1] = currComp.config.key;
 			}
+
 			var node = originalFn.apply(null, args);
 			this.updateElementIfNotReached_(node, args);
 			return node;
@@ -6284,6 +6362,24 @@ babelHelpers;
 		};
 
 		/**
+   * Renders the contents for the given tag.
+   * @param {!function()|string} tag
+   * @param {!Object} config
+   * @protected
+   */
+
+
+		IncrementalDomRenderer.prototype.renderFromTag_ = function renderFromTag_(tag, config) {
+			if (core.isString(tag) || tag.prototype.getRenderer) {
+				var comp = this.renderSubComponent_(tag, config);
+				this.updateElementIfNotReached_(comp);
+				return comp.element;
+			} else {
+				return tag(config);
+			}
+		};
+
+		/**
    * Calls functions from `IncrementalDOM` to build the component element's
    * content. Can be overriden by subclasses (for integration with template
    * engines for example).
@@ -6291,7 +6387,11 @@ babelHelpers;
 
 
 		IncrementalDomRenderer.prototype.renderIncDom = function renderIncDom() {
-			IncrementalDOM.elementVoid('div');
+			if (this.component_.render) {
+				this.component_.render();
+			} else {
+				IncrementalDOM.elementVoid('div');
+			}
 		};
 
 		/**
@@ -6321,13 +6421,17 @@ babelHelpers;
 			this.changes_ = {};
 			this.rootElementReached_ = false;
 			this.subComponentsFound_ = {};
-			this.generatedKeyCount_ = 0;
+			this.generatedKeyCount_ = {};
 			this.listenersToAttach_ = [];
+			this.currentPrefix_ = '';
 			this.intercept_();
 			this.renderIncDom();
 			IncrementalDomAop.stopInterception();
 			this.attachInlineListeners_();
 			IncrementalDomRenderer.finishedRenderingComponent();
+			if (!this.rootElementReached_) {
+				this.component_.element = null;
+			}
 			this.emit('rendered', !this.component_.wasRendered);
 		};
 
@@ -6344,11 +6448,12 @@ babelHelpers;
 
 
 		IncrementalDomRenderer.prototype.renderSubComponent_ = function renderSubComponent_(tagOrCtor, config) {
-			var key = config.key || 'sub' + this.generatedKeyCount_++;
+			var key = config.key || this.buildKey_();
 			var comp = this.getSubComponent_(key, tagOrCtor, config);
 			this.updateContext_(comp);
 			var renderer = comp.getRenderer();
 			if (renderer instanceof IncrementalDomRenderer) {
+				renderer.lastParentComponent_ = IncrementalDomRenderer.getComponentBeingRendered();
 				renderer.renderInsidePatch();
 			} else {
 				console.warn('IncrementalDomRenderer doesn\'t support rendering sub components ' + 'that don\'t use IncrementalDomRenderer as well, like:', comp);
@@ -6385,9 +6490,11 @@ babelHelpers;
 
 
 		IncrementalDomRenderer.prototype.skipRerender_ = function skipRerender_() {
-			IncrementalDOM.elementOpen.apply(null, this.lastElementCreationCall_);
-			IncrementalDOM.skip();
-			IncrementalDOM.elementClose(this.lastElementCreationCall_[0]);
+			if (this.lastElementCreationCall_.length > 0) {
+				IncrementalDOM.elementOpen.apply(null, this.lastElementCreationCall_);
+				IncrementalDOM.skip();
+				IncrementalDOM.elementClose(this.lastElementCreationCall_[0]);
+			}
 		};
 
 		/**
@@ -6407,12 +6514,27 @@ babelHelpers;
 
 
 		IncrementalDomRenderer.prototype.patch = function patch() {
+			if (!this.component_.element && this.lastParentComponent_) {
+				// If the component has no content but was rendered from another component,
+				// we'll need to patch this parent to make sure that any new content will
+				// be added in the right place.
+				this.lastParentComponent_.getRenderer().patch();
+				return;
+			}
+
 			var tempParent = this.guaranteeParent_();
 			if (tempParent) {
 				IncrementalDOM.patch(tempParent, this.renderInsidePatchDontSkip_);
 				dom.exitDocument(this.component_.element);
+				if (this.component_.element && this.component_.inDocument) {
+					this.component_.renderElement_(this.attachData_.parent, this.attachData_.sibling);
+				}
 			} else {
-				IncrementalDOM.patchOuter(this.component_.element, this.renderInsidePatchDontSkip_);
+				var element = this.component_.element;
+				IncrementalDOM.patchOuter(element, this.renderInsidePatchDontSkip_);
+				if (!this.component_.element) {
+					dom.exitDocument(element);
+				}
 			}
 		};
 
@@ -6453,7 +6575,7 @@ babelHelpers;
 
 				if (nodeOrComponent instanceof Component) {
 					var renderer = nodeOrComponent.getRenderer();
-					args = renderer instanceof IncrementalDomRenderer ? renderer.lastElementCreationCall_ : ['div'];
+					args = renderer instanceof IncrementalDomRenderer ? renderer.lastElementCreationCall_ : [];
 					node = nodeOrComponent.element;
 				}
 
@@ -6524,7 +6646,7 @@ babelHelpers;
      */
 
     /**
-     * @define {boolean} Overridden to true by the compiler when
+     * @type {boolean} Overridden to true by the compiler when
      *     --process_closure_primitives is specified.
      */
     var COMPILED = false;
@@ -6658,7 +6780,7 @@ babelHelpers;
     };
 
     /**
-     * @define {boolean} DEBUG is provided as a convenience so that debugging code
+     * @type {boolean} DEBUG is provided as a convenience so that debugging code
      * that should not be included in a production js_binary can be easily stripped
      * by specifying --define goog.DEBUG=false to the JSCompiler. For example, most
      * toString() methods should be declared inside an "if (goog.DEBUG)" conditional
@@ -6668,7 +6790,7 @@ babelHelpers;
     goog.define('goog.DEBUG', true);
 
     /**
-     * @define {string} LOCALE defines the locale being used for compilation. It is
+     * @type {string} LOCALE defines the locale being used for compilation. It is
      * used to select locale specific data to be compiled in js binary. BUILD rule
      * can specify this value by "--define goog.LOCALE=<locale_name>" as JSCompiler
      * option.
@@ -6689,7 +6811,7 @@ babelHelpers;
     goog.define('goog.LOCALE', 'en'); // default to en
 
     /**
-     * @define {boolean} Whether this code is running on trusted sites.
+     * @type {boolean} Whether this code is running on trusted sites.
      *
      * On untrusted sites, several native functions can be defined or overridden by
      * external libraries like Prototype, Datejs, and JQuery and setting this flag
@@ -6702,7 +6824,7 @@ babelHelpers;
     goog.define('goog.TRUSTED_SITE', true);
 
     /**
-     * @define {boolean} Whether a project is expected to be running in strict mode.
+     * @type {boolean} Whether a project is expected to be running in strict mode.
      *
      * This define can be used to trigger alternate implementations compatible with
      * running in EcmaScript Strict mode or warn about unavailable functionality.
@@ -6712,13 +6834,13 @@ babelHelpers;
     goog.define('goog.STRICT_MODE_COMPATIBLE', false);
 
     /**
-     * @define {boolean} Whether code that calls {@link goog.setTestOnly} should
+     * @type {boolean} Whether code that calls {@link goog.setTestOnly} should
      *     be disallowed in the compilation unit.
      */
     goog.define('goog.DISALLOW_TEST_ONLY_CODE', COMPILED && !goog.DEBUG);
 
     /**
-     * @define {boolean} Whether to use a Chrome app CSP-compliant method for
+     * @type {boolean} Whether to use a Chrome app CSP-compliant method for
      *     loading scripts via goog.require. @see appendScriptSrcNode_.
      */
     goog.define('goog.ENABLE_CHROME_APP_SAFE_SCRIPT_LOADING', false);
@@ -7038,7 +7160,7 @@ babelHelpers;
     // for example). See bootstrap/ for more information.
 
     /**
-     * @define {boolean} Whether to enable the debug loader.
+     * @type {boolean} Whether to enable the debug loader.
      *
      * If enabled, a call to goog.require() will attempt to load the namespace by
      * appending a script tag to the DOM (if the namespace has been registered).
@@ -7182,7 +7304,7 @@ babelHelpers;
     goog.instantiatedSingletons_ = [];
 
     /**
-     * @define {boolean} Whether to load goog.modules using {@code eval} when using
+     * @type {boolean} Whether to load goog.modules using {@code eval} when using
      * the debug loader.  This provides a better debugging experience as the
      * source is unmodified and can be edited using Chrome Workspaces or similar.
      * However in some environments the use of {@code eval} is banned
@@ -7191,7 +7313,7 @@ babelHelpers;
     goog.define('goog.LOAD_MODULE_USING_EVAL', true);
 
     /**
-     * @define {boolean} Whether the exports of goog.modules should be sealed when
+     * @type {boolean} Whether the exports of goog.modules should be sealed when
      * possible.
      */
     goog.define('goog.SEAL_MODULE_EXPORTS', goog.DEBUG);
@@ -8977,7 +9099,7 @@ babelHelpers;
     goog.provide('goog.i18n.bidi.Format');
 
     /**
-     * @define {boolean} FORCE_RTL forces the {@link goog.i18n.bidi.IS_RTL} constant
+     * @type {boolean} FORCE_RTL forces the {@link goog.i18n.bidi.IS_RTL} constant
      * to say that the current locale is a RTL locale.  This should only be used
      * if you want to override the default behavior for deciding whether the
      * current locale is RTL or not.
@@ -9749,7 +9871,7 @@ babelHelpers;
     goog.provide('goog.asserts');
 
     /**
-     * @define {boolean} Whether to strip out asserts or to leave them in.
+     * @type {boolean} Whether to strip out asserts or to leave them in.
      */
     goog.define('goog.asserts.ENABLE_ASSERTS', goog.DEBUG);
 
@@ -11537,7 +11659,7 @@ babelHelpers;
 
 		Soy.prototype.renderIncDom = function renderIncDom() {
 			var elementTemplate = this.component_.constructor.TEMPLATE;
-			if (core.isFunction(elementTemplate)) {
+			if (core.isFunction(elementTemplate) && !this.component_.render) {
 				elementTemplate = SoyAop.getOriginalFn(elementTemplate);
 				SoyAop.startInterception(Soy.handleInterceptedCall_);
 				elementTemplate(this.buildTemplateData_(elementTemplate.params || []), null, ijData);
@@ -11566,8 +11688,9 @@ babelHelpers;
 
 
 		Soy.prototype.shouldUpdate = function shouldUpdate(changes) {
-			if (!_IncrementalDomRender.prototype.shouldUpdate.call(this, changes)) {
-				return false;
+			var should = _IncrementalDomRender.prototype.shouldUpdate.call(this, changes);
+			if (!should || this.component_.shouldUpdate) {
+				return should;
 			}
 
 			var fn = this.component_.constructor.TEMPLATE;
@@ -12369,6 +12492,192 @@ babelHelpers;
   var templates;
   goog.loadModule(function (exports) {
 
+    // This file was automatically generated from ZsFootballMatch.soy.
+    // Please don't edit this file by hand.
+
+    /**
+     * @fileoverview Templates in namespace ZsFootballMatch.
+     * @public
+     */
+
+    goog.module('ZsFootballMatch.incrementaldom');
+
+    /** @suppress {extraRequire} */
+    var soy = goog.require('soy');
+    /** @suppress {extraRequire} */
+    var soydata = goog.require('soydata');
+    /** @suppress {extraRequire} */
+    goog.require('goog.i18n.bidi');
+    /** @suppress {extraRequire} */
+    goog.require('goog.asserts');
+    var IncrementalDom = goog.require('incrementaldom');
+    var ie_open = IncrementalDom.elementOpen;
+    var ie_close = IncrementalDom.elementClose;
+    var ie_void = IncrementalDom.elementVoid;
+    var ie_open_start = IncrementalDom.elementOpenStart;
+    var ie_open_end = IncrementalDom.elementOpenEnd;
+    var itext = IncrementalDom.text;
+    var iattr = IncrementalDom.attr;
+
+    /**
+     * @param {Object<string, *>=} opt_data
+     * @param {(null|undefined)=} opt_ignored
+     * @param {Object<string, *>=} opt_ijData
+     * @return {void}
+     * @suppress {checkTypes}
+     */
+    function $render(opt_data, opt_ignored, opt_ijData) {
+      var $$temp;
+      switch (goog.isObject($$temp = opt_data.viewType) ? $$temp.toString() : $$temp) {
+        case 0:
+          $renderRowView_(opt_data, null, opt_ijData);
+          break;
+        case 1:
+          $renderRowView_(opt_data, null, opt_ijData);
+          break;
+      }
+    }
+    exports.render = $render;
+    if (goog.DEBUG) {
+      $render.soyTemplateName = 'ZsFootballMatch.render';
+    }
+
+    /**
+     * @param {Object<string, *>=} opt_data
+     * @param {(null|undefined)=} opt_ignored
+     * @param {Object<string, *>=} opt_ijData
+     * @return {void}
+     * @suppress {checkTypes}
+     */
+    function $renderRowView_(opt_data, opt_ignored, opt_ijData) {
+      ie_open('table', null, null, 'class', 'zsfootball-match table' + (opt_data.elementClasses ? ' ' + opt_data.elementClasses : ''));
+      ie_open('tr', null, null, 'class', 'zsfootball-match-row');
+      ie_open('td', null, null, 'class', 'match-date');
+      itext((goog.asserts.assert(opt_data.match.localHourMinute != null), opt_data.match.localHourMinute));
+      ie_close('td');
+      ie_open('td', null, null, 'class', 'home-club');
+      itext((goog.asserts.assert(opt_data.match.homeClub != null), opt_data.match.homeClub));
+      ie_close('td');
+      ie_open('td', null, null, 'class', 'result');
+      itext((goog.asserts.assert(opt_data.match.homeGoals != null), opt_data.match.homeGoals));
+      itext(' - ');
+      itext((goog.asserts.assert(opt_data.match.awayGoals != null), opt_data.match.awayGoals));
+      ie_close('td');
+      ie_open('td', null, null, 'class', 'away-club');
+      itext((goog.asserts.assert(opt_data.match.awayClub != null), opt_data.match.awayClub));
+      ie_close('td');
+      ie_open('td', null, null, 'class', 'attendance');
+      itext((goog.asserts.assert(opt_data.match.attendance != null), opt_data.match.attendance));
+      ie_close('td');
+      ie_close('tr');
+      ie_open('tr', null, null, 'class', 'zsfootball-match-details hide');
+      ie_open('table');
+      ie_open('tr');
+      ie_open('td');
+      itext('g1');
+      ie_close('td');
+      ie_open('td');
+      itext('g2');
+      ie_close('td');
+      ie_close('tr');
+      ie_close('table');
+      ie_close('tr');
+      ie_open('table');
+    }
+    exports.renderRowView_ = $renderRowView_;
+    if (goog.DEBUG) {
+      $renderRowView_.soyTemplateName = 'ZsFootballMatch.renderRowView_';
+    }
+
+    exports.render.params = ["match", "viewType", "elementClasses"];
+    exports.render.types = { "match": "any", "viewType": "any", "elementClasses": "any" };
+    exports.renderRowView_.params = ["elementClasses", "match"];
+    exports.renderRowView_.types = { "elementClasses": "any", "match": "any" };
+    templates = exports;
+    return exports;
+  });
+
+  var ZsFootballMatch = function (_Component) {
+    babelHelpers.inherits(ZsFootballMatch, _Component);
+
+    function ZsFootballMatch() {
+      babelHelpers.classCallCheck(this, ZsFootballMatch);
+      return babelHelpers.possibleConstructorReturn(this, _Component.apply(this, arguments));
+    }
+
+    return ZsFootballMatch;
+  }(Component);
+
+  Soy.register(ZsFootballMatch, templates);
+  this.metalNamed.ZsFootballMatch = this.metalNamed.ZsFootballMatch || {};
+  this.metalNamed.ZsFootballMatch.ZsFootballMatch = ZsFootballMatch;
+  this.metalNamed.ZsFootballMatch.templates = templates;
+  this.metal.ZsFootballMatch = templates;
+  /* jshint ignore:end */
+}).call(this);
+'use strict';
+
+(function () {
+	var core = this.metal.metal;
+	var Component = this.metal.component;
+	var Soy = this.metal.Soy;
+	var Match = this.metalNamed.models.Match;
+	var templates = this.metal.ZsFootballMatch;
+
+	var ZsFootballMatch = function (_Component) {
+		babelHelpers.inherits(ZsFootballMatch, _Component);
+
+		function ZsFootballMatch() {
+			babelHelpers.classCallCheck(this, ZsFootballMatch);
+			return babelHelpers.possibleConstructorReturn(this, _Component.apply(this, arguments));
+		}
+
+		/**
+   *
+   */
+
+		ZsFootballMatch.prototype.setMatch_ = function setMatch_(value) {
+			return new Match(value);
+		};
+
+		return ZsFootballMatch;
+	}(Component);
+
+	Soy.register(ZsFootballMatch, templates);
+
+	ZsFootballMatch.STATE = {
+		/**
+   *
+   */
+		match: {
+			setter: 'setMatch_'
+		},
+
+		/**
+   *
+   */
+		viewType: {
+			value: 1
+		}
+	};
+
+	ZsFootballMatch.VIEW_TYPE = {
+		tableView: 0,
+		rowView: 1
+	};
+
+	this.metal.ZsFootballMatch = ZsFootballMatch;
+}).call(this);
+'use strict';
+
+(function () {
+  /* jshint ignore:start */
+  var Component = this.metal.Component;
+  var Soy = this.metal.Soy;
+
+  var templates;
+  goog.loadModule(function (exports) {
+
     // This file was automatically generated from ZsFootballRound.soy.
     // Please don't edit this file by hand.
 
@@ -12434,7 +12743,7 @@ babelHelpers;
       var matchListLen29 = matchList29.length;
       for (var matchIndex29 = 0; matchIndex29 < matchListLen29; matchIndex29++) {
         var matchData29 = matchList29[matchIndex29];
-        $renderRowView_({ match: matchData29, viewType: 1 }, null, opt_ijData);
+        $renderMatchRow_({ roundId: opt_data.id, match: matchData29 }, null, opt_ijData);
       }
       ie_close('tbody');
       ie_close('table');
@@ -12451,36 +12760,20 @@ babelHelpers;
      * @return {void}
      * @suppress {checkTypes}
      */
-    function $renderRowView_(opt_data, opt_ignored, opt_ijData) {
-      ie_open('tr', null, null, 'class', 'zsfootball-match' + (opt_data.elementClasses ? ' ' + opt_data.elementClasses : ''));
-      ie_open('td', null, null, 'class', 'match-date');
-      itext((goog.asserts.assert(opt_data.match.localHourMinute != null), opt_data.match.localHourMinute));
-      ie_close('td');
-      ie_open('td', null, null, 'class', 'home-club');
-      itext((goog.asserts.assert(opt_data.match.homeClub != null), opt_data.match.homeClub));
-      ie_close('td');
-      ie_open('td', null, null, 'class', 'result');
-      itext((goog.asserts.assert(opt_data.match.homeGoals != null), opt_data.match.homeGoals));
-      itext(' - ');
-      itext((goog.asserts.assert(opt_data.match.awayGoals != null), opt_data.match.awayGoals));
-      ie_close('td');
-      ie_open('td', null, null, 'class', 'away-club');
-      itext((goog.asserts.assert(opt_data.match.awayClub != null), opt_data.match.awayClub));
-      ie_close('td');
-      ie_open('td', null, null, 'class', 'attendance');
-      itext((goog.asserts.assert(opt_data.match.attendance != null), opt_data.match.attendance));
-      ie_close('td');
+    function $renderMatchRow_(opt_data, opt_ignored, opt_ijData) {
+      ie_open('tr');
+      ie_void('td', null, null, 'id', 'zsfootball_round_' + opt_data.roundId + '_' + opt_data.match.id);
       ie_close('tr');
     }
-    exports.renderRowView_ = $renderRowView_;
+    exports.renderMatchRow_ = $renderMatchRow_;
     if (goog.DEBUG) {
-      $renderRowView_.soyTemplateName = 'ZsFootballRound.renderRowView_';
+      $renderMatchRow_.soyTemplateName = 'ZsFootballRound.renderMatchRow_';
     }
 
-    exports.render.params = ["elementClasses", "round", "matches", "roundDay"];
-    exports.render.types = { "elementClasses": "any", "round": "any", "matches": "any", "roundDay": "any" };
-    exports.renderRowView_.params = ["elementClasses", "match"];
-    exports.renderRowView_.types = { "elementClasses": "any", "match": "any" };
+    exports.render.params = ["elementClasses", "id", "round", "matches", "roundDay"];
+    exports.render.types = { "elementClasses": "any", "id": "any", "round": "any", "matches": "any", "roundDay": "any" };
+    exports.renderMatchRow_.params = ["roundId", "match"];
+    exports.renderMatchRow_.types = { "roundId": "any", "match": "any" };
     templates = exports;
     return exports;
   });
@@ -12510,6 +12803,7 @@ babelHelpers;
 	var Soy = this.metal.Soy;
 	var Match = this.metalNamed.models.Match;
 	var Round = this.metalNamed.models.Round;
+	var ZsFootballMatch = this.metal.ZsFootballMatch;
 	var templates = this.metal.ZsFootballRound;
 
 	var ZsFootballRound = function (_Component) {
@@ -12520,9 +12814,23 @@ babelHelpers;
 			return babelHelpers.possibleConstructorReturn(this, _Component.apply(this, arguments));
 		}
 
+		ZsFootballRound.prototype.attached = function attached() {
+			this.setMatches_(this.matches);
+		};
+		/**
+   * Returns the `ZsfootbalMatch` component being used to render the matched items.
+   * @return {!ZsfootbalMatch}
+   */
+
+
+		ZsFootballRound.prototype.getZsFootballMatch = function getZsFootballMatch() {
+			return this.components.ZsFootballMatch;
+		};
+
 		/**
    *
    */
+
 
 		ZsFootballRound.prototype.setRound_ = function setRound_(value) {
 			return new Round(value);
@@ -12537,7 +12845,7 @@ babelHelpers;
 			var matches = [];
 
 			for (var i = 0; i < values.length; i++) {
-				matches.push(new Match(values[i]));
+				matches.push(new ZsFootballMatch({ match: values[i] }, this.element.children[1].children[i].children[0]));
 			}
 
 			return matches;
@@ -12567,9 +12875,7 @@ babelHelpers;
 		/**
    *
    */
-		matches: {
-			setter: 'setMatches_'
-		},
+		matches: {},
 
 		/**
    *

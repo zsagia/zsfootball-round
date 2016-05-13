@@ -71,7 +71,7 @@ function $render(opt_data, opt_ignored, opt_ijData) {
       var matchListLen29 = matchList29.length;
       for (var matchIndex29 = 0; matchIndex29 < matchListLen29; matchIndex29++) {
         var matchData29 = matchList29[matchIndex29];
-        $renderRowView_({match: matchData29, viewType: 1}, null, opt_ijData);
+        $renderMatchRow_({roundId: opt_data.id, match: matchData29}, null, opt_ijData);
       }
     ie_close('tbody');
   ie_close('table');
@@ -89,42 +89,21 @@ if (goog.DEBUG) {
  * @return {void}
  * @suppress {checkTypes}
  */
-function $renderRowView_(opt_data, opt_ignored, opt_ijData) {
-  ie_open('tr', null, null,
-      'class', 'zsfootball-match' + (opt_data.elementClasses ? ' ' + opt_data.elementClasses : ''));
-    ie_open('td', null, null,
-        'class', 'match-date');
-      itext((goog.asserts.assert((opt_data.match.localHourMinute) != null), opt_data.match.localHourMinute));
-    ie_close('td');
-    ie_open('td', null, null,
-        'class', 'home-club');
-      itext((goog.asserts.assert((opt_data.match.homeClub) != null), opt_data.match.homeClub));
-    ie_close('td');
-    ie_open('td', null, null,
-        'class', 'result');
-      itext((goog.asserts.assert((opt_data.match.homeGoals) != null), opt_data.match.homeGoals));
-      itext(' - ');
-      itext((goog.asserts.assert((opt_data.match.awayGoals) != null), opt_data.match.awayGoals));
-    ie_close('td');
-    ie_open('td', null, null,
-        'class', 'away-club');
-      itext((goog.asserts.assert((opt_data.match.awayClub) != null), opt_data.match.awayClub));
-    ie_close('td');
-    ie_open('td', null, null,
-        'class', 'attendance');
-      itext((goog.asserts.assert((opt_data.match.attendance) != null), opt_data.match.attendance));
-    ie_close('td');
+function $renderMatchRow_(opt_data, opt_ignored, opt_ijData) {
+  ie_open('tr');
+    ie_void('td', null, null,
+        'id', 'zsfootball_round_' + opt_data.roundId + '_' + opt_data.match.id);
   ie_close('tr');
 }
-exports.renderRowView_ = $renderRowView_;
+exports.renderMatchRow_ = $renderMatchRow_;
 if (goog.DEBUG) {
-  $renderRowView_.soyTemplateName = 'ZsFootballRound.renderRowView_';
+  $renderMatchRow_.soyTemplateName = 'ZsFootballRound.renderMatchRow_';
 }
 
-exports.render.params = ["elementClasses","round","matches","roundDay"];
-exports.render.types = {"elementClasses":"any","round":"any","matches":"any","roundDay":"any"};
-exports.renderRowView_.params = ["elementClasses","match"];
-exports.renderRowView_.types = {"elementClasses":"any","match":"any"};
+exports.render.params = ["elementClasses","id","round","matches","roundDay"];
+exports.render.types = {"elementClasses":"any","id":"any","round":"any","matches":"any","roundDay":"any"};
+exports.renderMatchRow_.params = ["roundId","match"];
+exports.renderMatchRow_.types = {"roundId":"any","match":"any"};
 templates = exports;
 return exports;
 

@@ -21,3 +21,7 @@
 
 .zsfootball-round .zsfootball-match match-date {
   width: 10%; }
+
+.zsfootball-round table.zsfootball-match {
+  background-color: inherit;
+  margin-bottom: 0px; }

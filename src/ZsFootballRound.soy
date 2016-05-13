@@ -3,6 +3,7 @@
 /**
  * This renders the main element.
  * @param? elementClasses
+ * @param id
  * @param round
  * @param matches
  * @param roundDay
@@ -20,9 +21,9 @@
 		</caption>
 		<tbody>
 			{foreach $match in $matches}
-				{call .renderRowView_}
+				{call .renderMatchRow_}
+					{param roundId: $id /}
 					{param match: $match /}
-					{param viewType: 1 /}
 				{/call}
 			{/foreach} 
 		</tbody>
@@ -30,15 +31,11 @@
 {/template}
 
 /**
- * @param? elementClasses
+ * @param roundId
  * @param match
  */
-{template .renderRowView_}
-	<tr class="zsfootball-match{$elementClasses ? ' ' + $elementClasses : ''}">
-		<td class="match-date">{$match.localHourMinute}</td>
-		<td class="home-club">{$match.homeClub}</td>
-		<td class="result">{$match.homeGoals} - {$match.awayGoals}</td>
-		<td class="away-club">{$match.awayClub}</td>
-		<td class="attendance">{$match.attendance}</td>
+{template .renderMatchRow_}
+	<tr>
+		<td id="zsfootball_round_{$roundId}_{$match.id}"></td>
 	</tr>
 {/template}
