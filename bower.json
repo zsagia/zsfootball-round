@@ -1,6 +1,6 @@
 {
   "name": "zsfootball-round",
-  "version": "0.2.4", 
+  "version": "0.3.0", 
   "description": "A round component to group matches",
   "main": [
     "build/globals/zsFootballRound-min.js",
