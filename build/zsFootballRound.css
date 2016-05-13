@@ -4,24 +4,32 @@
   .zsfootball-round caption span {
     padding-right: 10px; }
 
-.zsfootball-round .zsfootball-match .away-club {
+.zsfootball-round .zsfootball-match-row .away-club {
   font-weight: bold;
   text-align: left;
-  width: 40%; }
+  width: 35%; }
 
-.zsfootball-round .zsfootball-match .home-club {
+.zsfootball-round .zsfootball-match-row .home-club {
   font-weight: bold;
   text-align: right;
-  width: 40%; }
+  width: 35%; }
 
-.zsfootball-round .zsfootball-match .result {
+.zsfootball-round .zsfootball-match-row .result {
   font-weight: inherit;
   text-align: center;
   width: 10%; }
 
-.zsfootball-round .zsfootball-match match-date {
+.zsfootball-round .zsfootball-match-row .match-date {
+  font-weight: bold;
+  text-align: left;
+  width: 10%; }
+
+.zsfootball-round .zsfootball-match-row .attendance {
+  font-weight: bold;
+  text-align: right;
   width: 10%; }
 
 .zsfootball-round table.zsfootball-match {
   background-color: inherit;
-  margin-bottom: 0px; }
+  margin-bottom: 0px;
+  width: 100% !important; }

@@ -12550,7 +12550,7 @@ babelHelpers;
      * @suppress {checkTypes}
      */
     function $renderRowView_(opt_data, opt_ignored, opt_ijData) {
-      ie_open('table', null, null, 'class', 'zsfootball-match table' + (opt_data.elementClasses ? ' ' + opt_data.elementClasses : ''));
+      ie_open('table', null, null, 'class', 'zsfootball-match' + (opt_data.elementClasses ? ' ' + opt_data.elementClasses : ''), 'data-onclick', 'onRowClickHandler');
       ie_open('tr', null, null, 'class', 'zsfootball-match-row');
       ie_open('td', null, null, 'class', 'match-date');
       itext((goog.asserts.assert(opt_data.match.localHourMinute != null), opt_data.match.localHourMinute));
@@ -12573,16 +12573,12 @@ babelHelpers;
       ie_open('tr', null, null, 'class', 'zsfootball-match-details hide');
       ie_open('table');
       ie_open('tr');
-      ie_open('td');
-      itext('g1');
-      ie_close('td');
-      ie_open('td');
-      itext('g2');
-      ie_close('td');
+      ie_void('td');
+      ie_void('td');
       ie_close('tr');
       ie_close('table');
       ie_close('tr');
-      ie_open('table');
+      ie_close('table');
     }
     exports.renderRowView_ = $renderRowView_;
     if (goog.DEBUG) {
@@ -12619,6 +12615,7 @@ babelHelpers;
 
 (function () {
 	var core = this.metal.metal;
+	var dom = this.metalNamed.dom.dom;
 	var Component = this.metal.component;
 	var Soy = this.metal.Soy;
 	var Match = this.metalNamed.models.Match;
@@ -12635,6 +12632,18 @@ babelHelpers;
 		/**
    *
    */
+
+		ZsFootballMatch.prototype.onRowClickHandler = function onRowClickHandler(event) {
+			var row = event.delegateTarget;
+
+			dom.toggleClasses(row, 'selected');
+			dom.toggleClasses(row.children[1], 'hide');
+		};
+
+		/**
+   *
+   */
+
 
 		ZsFootballMatch.prototype.setMatch_ = function setMatch_(value) {
 			return new Match(value);
