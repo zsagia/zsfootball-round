@@ -16,8 +16,6 @@
     "test"
   ],
   "scripts": {
-    "compile": "babel --presets es2015 -d lib/ src/",
-    "publish": "npm run compile",
     "test": "gulp test"
   },
   "keywords": [
@@ -31,8 +29,6 @@
     "zsfootball-models": "^0.2.2"
   },
   "devDependencies": {
-    "babel-cli": "^6.4.5",
-    "babel-preset-es2015": "^6.3.13",
     "gulp": "^3.8.11",
     "gulp-metal": "^1.0.0"
   }
