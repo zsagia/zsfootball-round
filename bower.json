@@ -3,9 +3,9 @@
   "version": "0.3.0", 
   "description": "A round component to group matches",
   "main": [
-    "build/globals/zsFootballRound-min.js",
-    "build/globals/zsFootballRound.js",
-    "build/zsFootballRound.css"
+    "build/globals/Round-min.js",
+    "build/globals/Round.js",
+    "build/round.css"
   ],
   "authors": [
     "Zsolt Szabo <zsolt.szabo@liferay.com>"

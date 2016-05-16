@@ -12128,15 +12128,44 @@ babelHelpers;
 	var Match = function (_Model) {
 		babelHelpers.inherits(Match, _Model);
 
-		function Match(opt_config, opt_parentElement) {
+		function Match() {
 			babelHelpers.classCallCheck(this, Match);
-			return babelHelpers.possibleConstructorReturn(this, _Model.call(this, opt_config, opt_parentElement));
+			return babelHelpers.possibleConstructorReturn(this, _Model.apply(this, arguments));
 		}
 
-		Match.prototype.getLocalHourMinute_ = function getLocalHourMinute_() {
-			var matchDate = new Date(this.matchDate);
+		/**
+   *
+   */
 
-			return matchDate.getHours() + ':' + (matchDate.getMinutes() === 0 ? '00' : matchDate.getMinutes());
+		Match.prototype.getAwayGoalList = function getAwayGoalList() {
+			return this.goals.awayGoalList || [];
+		};
+
+		/**
+   *
+   */
+
+
+		Match.prototype.getAwayGoals = function getAwayGoals() {
+			return this.goals.awayGoals || 0;
+		};
+
+		/**
+   *
+   */
+
+
+		Match.prototype.getHomeGoalList = function getHomeGoalList() {
+			return this.goals.homeGoalList || [];
+		};
+
+		/**
+   *
+   */
+
+
+		Match.prototype.getHomeGoals = function getHomeGoals() {
+			return this.goals.homeGoals || 0;
 		};
 
 		return Match;
@@ -12144,51 +12173,58 @@ babelHelpers;
 
 	Match.STATE = {
 		/**
-   *
+   * The number of spectators who attended this match
+   * @type {number}
    */
 		attendance: {},
 
 		/**
-   *
+   * It is a club instant, an id or a String which represent the away team
+   * @type {Object|string|number}
    */
 		awayClub: {},
 
 		/**
-   *
+   * It is true if the match has been finished
+   * @type {boolean}
+   * @default false
    */
-		awayGoals: {},
+		finished: {
+			value: false
+		},
 
 		/**
-   *
+   * It contains information about the goals which were on this match
+   * @type {Object}
+   * @default {}
    */
-		matchDate: {},
+		goals: {
+			value: {}
+		},
 
 		/**
-   *
+   * It is a club instant, an id or a String which represent the home team
+   * @type {Object|string|number}
    */
 		homeClub: {},
 
 		/**
-   *
+   * The location where this match was/will be played off
+   * @type {object}
    */
-		homeGoals: {},
+		location: {},
 
 		/**
-   *
+   * Represents date of this match in milliseconds
+   * @type {number}
    */
-		localHourMinute: {
-			valueFn: 'getLocalHourMinute_'
-		},
+		matchDate: {},
 
 		/**
-   *
+   * A Round model instanse, an id
+   * @type {Object|number|string}
    */
-		locationId: {},
-
-		/**
-   *
-   */
-		roundId: {}
+		round: {}
 	};
 
 	this.metal.Match = Match;
@@ -12492,15 +12528,15 @@ babelHelpers;
   var templates;
   goog.loadModule(function (exports) {
 
-    // This file was automatically generated from ZsFootballMatch.soy.
+    // This file was automatically generated from Match.soy.
     // Please don't edit this file by hand.
 
     /**
-     * @fileoverview Templates in namespace ZsFootballMatch.
+     * @fileoverview Templates in namespace Match.
      * @public
      */
 
-    goog.module('ZsFootballMatch.incrementaldom');
+    goog.module('Match.incrementaldom');
 
     /** @suppress {extraRequire} */
     var soy = goog.require('soy');
@@ -12539,7 +12575,7 @@ babelHelpers;
     }
     exports.render = $render;
     if (goog.DEBUG) {
-      $render.soyTemplateName = 'ZsFootballMatch.render';
+      $render.soyTemplateName = 'Match.render';
     }
 
     /**
@@ -12551,64 +12587,105 @@ babelHelpers;
      */
     function $renderRowView_(opt_data, opt_ignored, opt_ijData) {
       ie_open('table', null, null, 'class', 'zsfootball-match' + (opt_data.elementClasses ? ' ' + opt_data.elementClasses : ''), 'data-onclick', 'onRowClickHandler');
+      var goals__soy18 = opt_data.match.goals;
       ie_open('tr', null, null, 'class', 'zsfootball-match-row');
       ie_open('td', null, null, 'class', 'match-date');
-      itext((goog.asserts.assert(opt_data.match.localHourMinute != null), opt_data.match.localHourMinute));
+      itext((goog.asserts.assert(opt_data.localHourMinute != null), opt_data.localHourMinute));
       ie_close('td');
       ie_open('td', null, null, 'class', 'home-club');
       itext((goog.asserts.assert(opt_data.match.homeClub != null), opt_data.match.homeClub));
       ie_close('td');
       ie_open('td', null, null, 'class', 'result');
-      itext((goog.asserts.assert(opt_data.match.homeGoals != null), opt_data.match.homeGoals));
+      itext((goog.asserts.assert(goals__soy18.homeGoals.firstHalf.length + goals__soy18.homeGoals.secondHalf.length != null), goals__soy18.homeGoals.firstHalf.length + goals__soy18.homeGoals.secondHalf.length));
       itext(' - ');
-      itext((goog.asserts.assert(opt_data.match.awayGoals != null), opt_data.match.awayGoals));
+      itext((goog.asserts.assert(goals__soy18.awayGoals.firstHalf.length + goals__soy18.awayGoals.secondHalf.length != null), goals__soy18.awayGoals.firstHalf.length + goals__soy18.awayGoals.secondHalf.length));
       ie_close('td');
       ie_open('td', null, null, 'class', 'away-club');
       itext((goog.asserts.assert(opt_data.match.awayClub != null), opt_data.match.awayClub));
       ie_close('td');
-      ie_open('td', null, null, 'class', 'attendance');
-      itext((goog.asserts.assert(opt_data.match.attendance != null), opt_data.match.attendance));
+      ie_open('td', null, null, 'class', 'location');
+      itext((goog.asserts.assert(opt_data.match.location.name != null), opt_data.match.location.name));
       ie_close('td');
       ie_close('tr');
       ie_open('tr', null, null, 'class', 'zsfootball-match-details hide');
-      ie_open('table');
-      ie_open('tr');
-      ie_void('td');
-      ie_void('td');
-      ie_close('tr');
-      ie_close('table');
+      ie_open('td', null, null, 'colspan', '5');
+      $renderDetails_(opt_data, null, opt_ijData);
+      ie_close('td');
       ie_close('tr');
       ie_close('table');
     }
     exports.renderRowView_ = $renderRowView_;
     if (goog.DEBUG) {
-      $renderRowView_.soyTemplateName = 'ZsFootballMatch.renderRowView_';
+      $renderRowView_.soyTemplateName = 'Match.renderRowView_';
     }
 
-    exports.render.params = ["match", "viewType", "elementClasses"];
-    exports.render.types = { "match": "any", "viewType": "any", "elementClasses": "any" };
-    exports.renderRowView_.params = ["elementClasses", "match"];
-    exports.renderRowView_.types = { "elementClasses": "any", "match": "any" };
+    /**
+     * @param {Object<string, *>=} opt_data
+     * @param {(null|undefined)=} opt_ignored
+     * @param {Object<string, *>=} opt_ijData
+     * @return {void}
+     * @suppress {checkTypes}
+     */
+    function $renderDetails_(opt_data, opt_ignored, opt_ijData) {
+      ie_open('table');
+      var goals__soy37 = opt_data.match.goals;
+      ie_open('tr', null, null, 'class', 'first-half');
+      ie_open('td', null, null, 'class', 'first-half', 'colspan', '3');
+      itext('1. half');
+      ie_close('td');
+      ie_close('tr');
+      ie_open('tr', null, null, 'class', 'first-half');
+      ie_open('td', null, null, 'class', 'first-half');
+      itext((goog.asserts.assert(goals__soy37.homeGoals.firstHalf.length != null), goals__soy37.homeGoals.firstHalf.length));
+      itext(' - ');
+      itext((goog.asserts.assert(goals__soy37.awayGoals.firstHalf.length != null), goals__soy37.awayGoals.firstHalf.length));
+      ie_close('td');
+      ie_close('tr');
+      ie_open('tr', null, null, 'class', 'first-half', 'colspan', '3');
+      ie_open('td', null, null, 'class', 'first-half');
+      itext('2. half');
+      ie_close('td');
+      ie_close('tr');
+      ie_open('tr', null, null, 'class', 'second-half');
+      ie_open('td', null, null, 'class', 'first-half');
+      itext((goog.asserts.assert(goals__soy37.homeGoals.secondHalf.length != null), goals__soy37.homeGoals.secondHalf.length));
+      itext(' - ');
+      itext((goog.asserts.assert(goals__soy37.awayGoals.secondHalf.length != null), goals__soy37.awayGoals.secondHalf.length));
+      ie_close('td');
+      ie_close('tr');
+      ie_close('table');
+    }
+    exports.renderDetails_ = $renderDetails_;
+    if (goog.DEBUG) {
+      $renderDetails_.soyTemplateName = 'Match.renderDetails_';
+    }
+
+    exports.render.params = ["match", "localHourMinute", "viewType", "elementClasses"];
+    exports.render.types = { "match": "any", "localHourMinute": "any", "viewType": "any", "elementClasses": "any" };
+    exports.renderRowView_.params = ["elementClasses", "localHourMinute", "match"];
+    exports.renderRowView_.types = { "elementClasses": "any", "localHourMinute": "any", "match": "any" };
+    exports.renderDetails_.params = ["match"];
+    exports.renderDetails_.types = { "match": "any" };
     templates = exports;
     return exports;
   });
 
-  var ZsFootballMatch = function (_Component) {
-    babelHelpers.inherits(ZsFootballMatch, _Component);
+  var Match = function (_Component) {
+    babelHelpers.inherits(Match, _Component);
 
-    function ZsFootballMatch() {
-      babelHelpers.classCallCheck(this, ZsFootballMatch);
+    function Match() {
+      babelHelpers.classCallCheck(this, Match);
       return babelHelpers.possibleConstructorReturn(this, _Component.apply(this, arguments));
     }
 
-    return ZsFootballMatch;
+    return Match;
   }(Component);
 
-  Soy.register(ZsFootballMatch, templates);
-  this.metalNamed.ZsFootballMatch = this.metalNamed.ZsFootballMatch || {};
-  this.metalNamed.ZsFootballMatch.ZsFootballMatch = ZsFootballMatch;
-  this.metalNamed.ZsFootballMatch.templates = templates;
-  this.metal.ZsFootballMatch = templates;
+  Soy.register(Match, templates);
+  this.metalNamed.Match = this.metalNamed.Match || {};
+  this.metalNamed.Match.Match = Match;
+  this.metalNamed.Match.templates = templates;
+  this.metal.Match = templates;
   /* jshint ignore:end */
 }).call(this);
 'use strict';
@@ -12618,22 +12695,33 @@ babelHelpers;
 	var dom = this.metalNamed.dom.dom;
 	var Component = this.metal.component;
 	var Soy = this.metal.Soy;
-	var Match = this.metalNamed.models.Match;
-	var templates = this.metal.ZsFootballMatch;
+	var MatchModel = this.metalNamed.models.Match;
+	var templates = this.metal.Match;
 
-	var ZsFootballMatch = function (_Component) {
-		babelHelpers.inherits(ZsFootballMatch, _Component);
+	var Match = function (_Component) {
+		babelHelpers.inherits(Match, _Component);
 
-		function ZsFootballMatch() {
-			babelHelpers.classCallCheck(this, ZsFootballMatch);
+		function Match() {
+			babelHelpers.classCallCheck(this, Match);
 			return babelHelpers.possibleConstructorReturn(this, _Component.apply(this, arguments));
 		}
+
+		/**
+   * Based on match date calculates a date string
+   */
+
+		Match.prototype.getLocalHourMinute_ = function getLocalHourMinute_() {
+			var matchDate = new Date(this.match.matchDate);
+
+			return matchDate.getHours() + ':' + (matchDate.getMinutes() === 0 ? '00' : matchDate.getMinutes());
+		};
 
 		/**
    *
    */
 
-		ZsFootballMatch.prototype.onRowClickHandler = function onRowClickHandler(event) {
+
+		Match.prototype.onRowClickHandler = function onRowClickHandler(event) {
 			var row = event.delegateTarget;
 
 			dom.toggleClasses(row, 'selected');
@@ -12645,16 +12733,24 @@ babelHelpers;
    */
 
 
-		ZsFootballMatch.prototype.setMatch_ = function setMatch_(value) {
-			return new Match(value);
+		Match.prototype.setMatch_ = function setMatch_(value) {
+			return new MatchModel(value);
 		};
 
-		return ZsFootballMatch;
+		return Match;
 	}(Component);
 
-	Soy.register(ZsFootballMatch, templates);
+	Soy.register(Match, templates);
 
-	ZsFootballMatch.STATE = {
+	Match.STATE = {
+		/**
+   * It is a helper state for 'getLocalHourMinute_' method
+   * @type {function()}
+   */
+		localHourMinute: {
+			valueFn: 'getLocalHourMinute_'
+		},
+
 		/**
    *
    */
@@ -12670,12 +12766,12 @@ babelHelpers;
 		}
 	};
 
-	ZsFootballMatch.VIEW_TYPE = {
+	Match.VIEW_TYPE = {
 		tableView: 0,
 		rowView: 1
 	};
 
-	this.metal.ZsFootballMatch = ZsFootballMatch;
+	this.metal.Match = Match;
 }).call(this);
 'use strict';
 
@@ -12687,15 +12783,15 @@ babelHelpers;
   var templates;
   goog.loadModule(function (exports) {
 
-    // This file was automatically generated from ZsFootballRound.soy.
+    // This file was automatically generated from Round.soy.
     // Please don't edit this file by hand.
 
     /**
-     * @fileoverview Templates in namespace ZsFootballRound.
+     * @fileoverview Templates in namespace Round.
      * @public
      */
 
-    goog.module('ZsFootballRound.incrementaldom');
+    goog.module('Round.incrementaldom');
 
     /** @suppress {extraRequire} */
     var soy = goog.require('soy');
@@ -12759,7 +12855,7 @@ babelHelpers;
     }
     exports.render = $render;
     if (goog.DEBUG) {
-      $render.soyTemplateName = 'ZsFootballRound.render';
+      $render.soyTemplateName = 'Round.render';
     }
 
     /**
@@ -12776,7 +12872,7 @@ babelHelpers;
     }
     exports.renderMatchRow_ = $renderMatchRow_;
     if (goog.DEBUG) {
-      $renderMatchRow_.soyTemplateName = 'ZsFootballRound.renderMatchRow_';
+      $renderMatchRow_.soyTemplateName = 'Round.renderMatchRow_';
     }
 
     exports.render.params = ["elementClasses", "id", "round", "matches", "roundDay"];
@@ -12787,22 +12883,22 @@ babelHelpers;
     return exports;
   });
 
-  var ZsFootballRound = function (_Component) {
-    babelHelpers.inherits(ZsFootballRound, _Component);
+  var Round = function (_Component) {
+    babelHelpers.inherits(Round, _Component);
 
-    function ZsFootballRound() {
-      babelHelpers.classCallCheck(this, ZsFootballRound);
+    function Round() {
+      babelHelpers.classCallCheck(this, Round);
       return babelHelpers.possibleConstructorReturn(this, _Component.apply(this, arguments));
     }
 
-    return ZsFootballRound;
+    return Round;
   }(Component);
 
-  Soy.register(ZsFootballRound, templates);
-  this.metalNamed.ZsFootballRound = this.metalNamed.ZsFootballRound || {};
-  this.metalNamed.ZsFootballRound.ZsFootballRound = ZsFootballRound;
-  this.metalNamed.ZsFootballRound.templates = templates;
-  this.metal.ZsFootballRound = templates;
+  Soy.register(Round, templates);
+  this.metalNamed.Round = this.metalNamed.Round || {};
+  this.metalNamed.Round.Round = Round;
+  this.metalNamed.Round.templates = templates;
+  this.metal.Round = templates;
   /* jshint ignore:end */
 }).call(this);
 'use strict';
@@ -12810,30 +12906,29 @@ babelHelpers;
 (function () {
 	var Component = this.metal.component;
 	var Soy = this.metal.Soy;
-	var Match = this.metalNamed.models.Match;
-	var Round = this.metalNamed.models.Round;
-	var ZsFootballMatch = this.metal.ZsFootballMatch;
-	var templates = this.metal.ZsFootballRound;
+	var RoundModel = this.metalNamed.models.Round;
+	var Match = this.metal.Match;
+	var templates = this.metal.Round;
 
-	var ZsFootballRound = function (_Component) {
-		babelHelpers.inherits(ZsFootballRound, _Component);
+	var Round = function (_Component) {
+		babelHelpers.inherits(Round, _Component);
 
-		function ZsFootballRound() {
-			babelHelpers.classCallCheck(this, ZsFootballRound);
+		function Round() {
+			babelHelpers.classCallCheck(this, Round);
 			return babelHelpers.possibleConstructorReturn(this, _Component.apply(this, arguments));
 		}
 
-		ZsFootballRound.prototype.attached = function attached() {
+		Round.prototype.attached = function attached() {
 			this.setMatches_(this.matches);
 		};
 		/**
-   * Returns the `ZsfootbalMatch` component being used to render the matched items.
-   * @return {!ZsfootbalMatch}
+   * Returns the `Match` component being used to render the matched items.
+   * @return {!Match}
    */
 
 
-		ZsFootballRound.prototype.getZsFootballMatch = function getZsFootballMatch() {
-			return this.components.ZsFootballMatch;
+		Round.prototype.getMatch = function getMatch() {
+			return this.components.Match;
 		};
 
 		/**
@@ -12841,8 +12936,8 @@ babelHelpers;
    */
 
 
-		ZsFootballRound.prototype.setRound_ = function setRound_(value) {
-			return new Round(value);
+		Round.prototype.setRound_ = function setRound_(value) {
+			return new RoundModel(value);
 		};
 
 		/**
@@ -12850,17 +12945,17 @@ babelHelpers;
    */
 
 
-		ZsFootballRound.prototype.setMatches_ = function setMatches_(values) {
+		Round.prototype.setMatches_ = function setMatches_(values) {
 			var matches = [];
 
 			for (var i = 0; i < values.length; i++) {
-				matches.push(new ZsFootballMatch({ match: values[i] }, this.element.children[1].children[i].children[0]));
+				matches.push(new Match({ match: values[i] }, this.element.children[1].children[i].children[0]));
 			}
 
 			return matches;
 		};
 
-		ZsFootballRound.prototype.setRoundDay_ = function setRoundDay_(value) {
+		Round.prototype.setRoundDay_ = function setRoundDay_(value) {
 			var day;
 
 			if (value) {
@@ -12875,19 +12970,19 @@ babelHelpers;
 			return day;
 		};
 
-		return ZsFootballRound;
+		return Round;
 	}(Component);
 
-	Soy.register(ZsFootballRound, templates);
+	Soy.register(Round, templates);
 
-	ZsFootballRound.STATE = {
+	Round.STATE = {
 		/**
-   *
+   * A Match component array
    */
 		matches: {},
 
 		/**
-   *
+   * The current Round
    */
 		round: {
 			setter: 'setRound_'
@@ -12901,7 +12996,7 @@ babelHelpers;
 		}
 	};
 
-	this.metal.ZsFootballRound = ZsFootballRound;
+	this.metal.Round = Round;
 }).call(this);
 }).call(this);
-//# sourceMappingURL=zsFootballRound.js.map
+//# sourceMappingURL=Round.js.map

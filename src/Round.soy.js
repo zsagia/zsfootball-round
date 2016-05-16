@@ -4,15 +4,15 @@ import Soy from 'metal-soy/src/Soy';
 var templates;
 goog.loadModule(function(exports) {
 
-// This file was automatically generated from ZsFootballRound.soy.
+// This file was automatically generated from Round.soy.
 // Please don't edit this file by hand.
 
 /**
- * @fileoverview Templates in namespace ZsFootballRound.
+ * @fileoverview Templates in namespace Round.
  * @public
  */
 
-goog.module('ZsFootballRound.incrementaldom');
+goog.module('Round.incrementaldom');
 
 /** @suppress {extraRequire} */
 var soy = goog.require('soy');
@@ -78,7 +78,7 @@ function $render(opt_data, opt_ignored, opt_ijData) {
 }
 exports.render = $render;
 if (goog.DEBUG) {
-  $render.soyTemplateName = 'ZsFootballRound.render';
+  $render.soyTemplateName = 'Round.render';
 }
 
 
@@ -97,7 +97,7 @@ function $renderMatchRow_(opt_data, opt_ignored, opt_ijData) {
 }
 exports.renderMatchRow_ = $renderMatchRow_;
 if (goog.DEBUG) {
-  $renderMatchRow_.soyTemplateName = 'ZsFootballRound.renderMatchRow_';
+  $renderMatchRow_.soyTemplateName = 'Round.renderMatchRow_';
 }
 
 exports.render.params = ["elementClasses","id","round","matches","roundDay"];
@@ -109,8 +109,8 @@ return exports;
 
 });
 
-class ZsFootballRound extends Component {}
-Soy.register(ZsFootballRound, templates);
-export { ZsFootballRound, templates };
+class Round extends Component {}
+Soy.register(Round, templates);
+export { Round, templates };
 export default templates;
 /* jshint ignore:end */

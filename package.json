@@ -8,8 +8,8 @@
     "node": ">=0.12.0",
     "npm": ">=3.0.0"
   },
-  "main": "lib/ZsFootballRound.js",
-  "browser": "src/ZsFootballRound.js",
+  "main": "lib/Round.js",
+  "browser": "src/Round.js",
   "files": [
     "lib",
     "src",

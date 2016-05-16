@@ -10,12 +10,12 @@
 		.away-club {
 			font-weight: bold;
 			text-align: left;
-			width: 35%;
+			width: 30%;
 		}
 		.home-club {
 			font-weight: bold;
 			text-align: right;
-			width: 35%;
+			width: 30%;
 		}
 		.result {
 			font-weight: inherit;
@@ -23,15 +23,13 @@
 			width: 10%;
 		}
 		.match-date {
-			font-weight: bold;
 			text-align: left;
-			width: 10%;
+			width: 15%;
 
 		}
-		.attendance {
-			font-weight: bold;
+		.location {
 			text-align: right;
-			width: 10%;
+			width: 15%;
 		}
 	}
 
@@ -39,5 +37,21 @@
 		background-color: inherit;
 		margin-bottom:0px;
 		width: 100% !important;
+	}
+
+	table.zsfootball-match.selected {
+		background-color: inherit;
+		
+		.zsfootball-match-details {
+			height: 100px;
+
+			table {
+				width: 100% !important;
+
+				tr {
+					text-align: center;
+				}
+			}
+		}
 	}
 }

@@ -2,28 +2,28 @@
 
 import Component from 'metal-component';
 import Soy from 'metal-soy';
-import { Match, Round } from 'zsfootball-models';
-import ZsFootballMatch from 'zsfootball-match';
+import { Round as RoundModel } from 'zsfootball-models';
+import Match from 'zsfootball-match';
 
-import templates from './ZsFootballRound.soy';
+import templates from './Round.soy';
 
-class ZsFootballRound extends Component  {
+class Round extends Component  {
 	attached() {
 		this.setMatches_(this.matches);
 	}
 	/**
-	 * Returns the `ZsfootbalMatch` component being used to render the matched items.
-	 * @return {!ZsfootbalMatch}
+	 * Returns the `Match` component being used to render the matched items.
+	 * @return {!Match}
 	 */
-	getZsFootballMatch() {
-		return this.components.ZsFootballMatch;
+	getMatch() {
+		return this.components.Match;
 	}
 
 	/**
 	 *
 	 */
 	setRound_(value) {
-	 	return new Round(value);
+	 	return new RoundModel(value);
 	}
 
 	/**
@@ -33,7 +33,7 @@ class ZsFootballRound extends Component  {
 		var matches = [];
 
 		for(let i = 0; i < values.length; i++) {
-			matches.push(new ZsFootballMatch({match:values[i]}, this.element.children[1].children[i].children[0])); 
+			matches.push(new Match({match:values[i]}, this.element.children[1].children[i].children[0])); 
 		}
 
 	 	return matches;
@@ -54,17 +54,17 @@ class ZsFootballRound extends Component  {
 		return day; 
 	}
 }
-Soy.register(ZsFootballRound, templates);
+Soy.register(Round, templates);
 
-ZsFootballRound.STATE = {
+Round.STATE = {
 	/**
-	 *
+	 * A Match component array
 	 */
 	matches: {
 	},
 
 	/**
-	 *
+	 * The current Round
 	 */
 	round: {
 		setter: 'setRound_'
@@ -78,4 +78,4 @@ ZsFootballRound.STATE = {
 	}
 }
 
-export default ZsFootballRound;
+export default Round;
