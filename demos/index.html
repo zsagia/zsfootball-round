@@ -5,9 +5,9 @@
 	<title>Demo: ZsFootballRound</title>
 
 	<link rel="stylesheet" href="../node_modules/bootstrap/dist/css/bootstrap.css">
-	<link rel="stylesheet" href="../build/zsFootballRound.css">
+	<link rel="stylesheet" href="../build/round.css">
 
-	<script src="../build/globals/zsFootballRound.js"></script>
+	<script src="../build/globals/Round.js"></script>
 	<style>
 		table {
 			margin: auto;
@@ -21,7 +21,7 @@
 <body>
 	<h1>ZsFootballRound Round View</h1>
 	<script type="text/javascript">
-		new metal.ZsFootballRound({
+		new metal.Round({
 			elementClasses: 'table-striped table-bordered',
 			round: {
 				id: 301,
@@ -39,76 +39,159 @@
 					id: 7101,
 					attendance: 75261,
 					awayClub: 'Tottenham Hotspurs',
-					awayGoals: 0,
+					goals: {
+						awayGoals: {
+							firstHalf: [
+								{22: 'Walker K. (Rooney W.) (own goal)'}
+							],
+							secondHalf: []
+						},
+						homeGoals: {
+							firstHalf: [],
+							secondHalf: []
+						}
+					},
 					homeClub: 'Manchester United',
-					homeGoals: 1,
 					matchDate: 1439041500000,
 					round: 1,
-					venue: {id: 6001},
+					location: {id: 6001, name: 'Old Trafford'},
 					type: {id: 1001, name: 'Premiere League'}
 				},
 				{
 					id: 7102,
 					attendance:  11155,
 					awayClub: 'Aston Villa',
-					awayGoals: 1,
+					goals: {
+						awayGoals: {
+							firstHalf: [],
+							secondHalf: [
+								{
+									72: '(Westwood A.) Gestede R.'
+								}
+							]
+						},
+						homeGoals: {
+							firstHalf: [],
+							secondHalf: []
+						}
+					},
 					homeClub: 'AFC Bournemouth',
-					homeGoals: 0,
 					matchDate: 1439046000000,
 					round: 1,
-					venue: {id: 6004},
+					location: {id: 6004, name: 'Vitality Stadium'},
 					type: {id: 1001, name: 'Premiere League'}
 				},
 				{
 					id: 7103,
 					attendance: 27036,
 					awayClub: 'Crystal Palace',
-					awayGoals: 3,
+					goals: {
+						awayGoals: {
+							firstHalf: [
+								{39: '(Puncheon J.) Zaha W.'}
+							],
+							secondHalf: [
+								{49: '(Souare P.) Delaney D.'},
+								{94: '(McArthur J.) Cabaye Y.'}
+							]
+						},
+						homeGoals: {
+							firstHalf: [],
+							secondHalf: [
+								{69: 'Redmond N. (Hoolahan W.)'}
+							]
+						}
+					},
 					homeClub: 'Norwich City',
-					homeGoals: 1,
 					matchDate: 1439046000000,
 					round: 1,
 					referee: 'Simon Hooper',
-					venue: {id: 6012},
+					location: {id: 6012, name: 'Carrow Road'},
 					type: {id: 1001, name: 'Premiere League'}
 				},
 				{
 					id: 7104,
 					attendance: 39063,
 					awayClub: 'Watford FC',
-					awayGoals: 2,
+					goals: {
+						awayGoals: {
+							firstHalf: [
+								{14: 'Layun M.'}
+							],
+							secondHalf: [
+								{83: '(Deeney T.) Ighalo O.'}
+							]
+						},
+						homeGoals: {
+							firstHalf: [],
+							secondHalf: [
+								{76: 'Barkley R. (Kone A.)'},
+								{86: 'Kone A. (Lukaku R.)'}
+							]
+						}
+					},
 					homeClub: 'Everton',
-					homeGoals: 2,
 					matchDate: 1439046000000,
 					round: 1,
 					referee: 'Mike Jones',
-					venue: 6007,
+					location: {id: 6007, name: 'Goodison Park'},
 					type: {id: 1001, name: 'Premiere League'}
 				},
 				{
 					id: 7105,
 					attendance: 32242,
 					awayClub: 'Sunderland AFC',
-					awayGoals: 2,
+					goals: {
+						awayGoals: {
+							firstHalf: [],
+							secondHalf: [
+								{60: '(Rodwell J.) Defoe J.'},
+								{71: '(Lens J.) Fletcher S.'}
+							]
+						},
+						homeGoals: {
+							firstHalf: [
+								{11: 'Vardy J. (Albrighton M.)'},
+								{18: 'Mahrez R. (Albrighton M.)'},
+								{25: 'Mahrez R. (Penalty)'}],
+							secondHalf: [
+								{66: 'Albrighton M.'}
+							]
+						}
+					},
 					homeClub: 'Leicester City',
-					homeGoals: 4,
 					matchDate: 1439046000000,
 					round: 1,
 					referee: 'Lee Mason',
-					venue: 6008,
+					location: {id: 6008, name: 'King Power Stadium'},
 					type: {id: 1001, name: 'Premiere League'}
 				},
 				{
 					id: 7106,
 					attendance: 41232,
 					awayClub: 'Swansea City',
-					awayGoals: 2,
+					goals: {
+						awayGoals: {
+							firstHalf: [
+								{29: 'Ayew A.'}
+							],
+							secondHalf: [
+								{55: '(Penalty) Gomis B.'}
+							]
+						},
+						homeGoals: {
+							firstHalf: [
+								{23: 'Oscar'},
+								{30: 'Fernandez F. (Own goal)'}
+							],
+							secondHalf: []
+						}
+					},
 					homeClub: 'Chelsea FC',
-					homeGoals: 2,
 					matchDate: 1439055000000,
 					round: 1,
 					referee: 'Michael Oliver',
-					venue: 6005,
+					location: {id: 6005, name: 'Stamford Bridge'},
 					type: {id: 1001, name: 'Premiere League'}
 				}
 			]
@@ -117,7 +200,7 @@
 
 		<h1>ZsFootballRound RoundDay View</h1>
 	<script>
-		new metal.ZsFootballRound({
+		new metal.Round({
 			elementClasses: 'table-striped table-bordered',
 			round: {
 				id: 301,
@@ -129,20 +212,30 @@
 					id: 7111,
 					attendance: 42200,
 					awayClub: 'Manchester United',
-					awayGoals: 1,
+					goals: {
+						awayGoals: {
+							firstHalf: [
+								{29: 'Mata J.) Januzaj A.'}
+							],
+							secondHalf: []
+						},
+						homeGoals: {
+							firstHalf: [],
+							secondHalf: []
+						}
+					},
 					homeClub: 'Aston Villa',
-					homeGoals: 0,
 					matchDate: 1439581500000,
 					round: 2,
 					referee: 'Mike Dean',
-					venue: 6003,
+					location: {id: 6003, name: 'Villa Park'},
 					type: {id: 1001, name: 'Premiere League'}
 				}
 			],
 			roundDay: new Date(1439581500000)
 		});
 
-		new metal.ZsFootballRound({
+		new metal.Round({
 			elementClasses: 'table-striped table-bordered',
 			round: {
 				id: 301,
@@ -154,78 +247,150 @@
 					id: 7112,
 					attendance: 36004,
 					awayClub: 'Stoke City',
-					awayGoals: 2,
+					goals: {
+						awayGoals: {
+							firstHalf: [],
+							secondHalf: [
+								{78: '(Penalty) Arnautovic M.'},
+								{83: '(Ireland S.) Diouf M.'}
+							]
+						},
+						homeGoals: {
+							firstHalf: [
+								{19: 'Dier E. (Eriksen C.)'},
+								{47: 'Chadli N. (Davies B.)'}],
+							secondHalf: []
+						}
+					},
 					homeClub: 'Tottenham Hotspurs',
-					homeGoals: 2,
 					matchDate: 1439650800000,
 					round: 2,
 					referee: 'Robert Madley',
-					venue: 6017,
+					location: {id: 6017, name: 'White Hart Lane'},
 					type: {id: 1001, name: 'Premiere League'}
 				},
 				{
 					id: 7113,
 					attendance: 41379,
 					awayClub: 'Norwich City',
-					awayGoals: 3,
+					goals: {
+						awayGoals: {
+							firstHalf: [
+								{26: 'Martin R.'},
+								{37: '(Hoolahan W.) Whittaker S.'}],
+							secondHalf: [
+								{57: '(Hoolahan W.) Redmond N.'}
+							]
+						},
+						homeGoals: {
+							firstHalf: [],
+							secondHalf: [
+								{88: 'Watmore D.'}
+							]
+						}
+					},
 					homeClub: 'Sunderland AFC',
-					homeGoals: 1,
 					matchDate: 1439650800000,
 					round: 2,
 					referee: 'Kevin Friend',
-					venue: 6015,
+					location: {id: 6015, name: 'Stadium of Light'},
 					type: {id: 1001, name: 'Premiere League'}
 				},
 				{
 					id: 7114,
 					attendance: 20678,
 					awayClub: 'Newcastle United',
-					awayGoals: 0,
+					goals: {
+						awayGoals: {
+							firstHalf: [],
+							secondHalf: []
+						},
+						homeGoals: {
+							firstHalf: [
+								{9: 'Gomis B. (Shelvey J.)'}
+							],
+							secondHalf: [
+								{52: 'Ayew A. (Montero J.)'}
+							]
+						}
+					},
 					homeClub: 'Swansea City',
-					homeGoals: 2,
 					matchDate: 1439650800000,
 					round: 2,
 					referee: 'Mike Jones',
-					venue: 6016,
+					location: {id: 6016, name: 'Liberty Stadium'},
 					type: {id: 1001, name: 'Premiere League'}
 				},
 				{
 					id: 7115,
 					attendance: 34857,
 					awayClub: 'Leicester City',
-					awayGoals: 2,
+					goals: {
+						awayGoals: {
+							firstHalf: [
+								{27: 'Okazaki S.'},
+								{38: '(Albrighton M.) Mahrez R.'}],
+							secondHalf: []
+						},
+						homeGoals: {
+							firstHalf: [],
+							secondHalf: [
+								{55: 'Payet D. (Kouyate C.)'}
+							]
+						}
+					},
 					homeClub: 'West Ham',
-					homeGoals: 1,
 					matchDate: 1439650800000,
 					round: 2,
 					referee: 'Anthony Taylor',
-					venue: 6020,
+					location: {id: 6020, name: 'Boleyn Ground'},
 					type: {id: 1001, name: 'Premiere League'}
 				},
 				{
 					id: 7116,
 					attendance: 20011,
 					awayClub: 'West Brom',
-					awayGoals: 0,
+					goals: {
+						awayGoals: {
+							firstHalf: [],
+							secondHalf: []
+						},
+						homeGoals: {
+							firstHalf: [],
+							secondHalf: []
+						}
+					},
 					homeClub: 'Watford FC',
-					homeGoals: 0,
 					matchDate: 1439650800000,
 					round: 2,
 					referee: 'Paul Tierney',
-					venue: 6018,
+					location: {id: 6018, name: 'Vicarage Road'},
 					type: {id: 1001, name: 'Premiere League'}
 				},
 				{
 					id: 7117,
 					attendance: 30966,
 					awayClub: 'Everton',
-					awayGoals: 3,
+					goals: {
+						awayGoals: {
+							firstHalf: [],
+							secondHalf: []
+						},
+						homeGoals: {
+							firstHalf: [
+								{22: '(Kone A.) Lukaku R.'},
+								{45: '(Barkley R.) Lukaku R.'}
+							],
+							secondHalf: [
+								{84: '(Coleman S.) Barkley R.'}
+							]
+						}
+					},
 					homeClub: 'Southampton',
-					homeGoals: 0,
 					matchDate: 1439642700000,
 					round: 2,
 					referee: 'Michael Oliver',
-					venue: 6013,
+					location: {id: 6013, name: 'St. Marys Stadium'},
 					type: {id: 1001, name: 'Premiere League'}
 				},
 
@@ -233,7 +398,7 @@
 			roundDay: new Date(1439650800000)
 		});
 
-		new metal.ZsFootballRound({
+		new metal.Round({
 			elementClasses: 'table-striped table-bordered',
 			round: {
 				id: 301,
@@ -245,28 +410,55 @@
 					id: 7118,
 					attendance: 54331,
 					awayClub: 'Chelsea FC',
-					awayGoals: 0,
+					goals: {
+						awayGoals: {
+							firstHalf: [],
+							secondHalf: []
+						},
+						homeGoals: {
+							firstHalf: [
+								{32: 'S. Agüero (Toure Y.)'}],
+							secondHalf: [
+								{79: 'Kompany V. (Silva D.)'},
+								{85: 'Fernandinho (Silva D.)'}
+							]
+						}
+					},
 					homeClub: 'Manchester City',
-					homeGoals: 3,
 					matchDate: 1439740800000,
-					round: 2
+					round: 2,
+					location: {id: 0, name: 'Etihad Stadium'}
 				},
 				{
 					id: 7119,
 					attendance: 24732,
 					awayClub: 'Arsenal',
-					awayGoals: 2,
+					goals: {
+						awayGoals: {
+							firstHalf: [
+								{16: '(Özil M.) Giroud O.'}
+							],
+							secondHalf: [
+								{55: '(Own goal) (Sanchez A.) Delaney D.'}]
+						},
+						homeGoals: {
+							firstHalf: [
+								{28: 'Ward J. (McArthur J.)'}],
+							secondHalf: [
+							]
+						}
+					},
 					homeClub: 'Crystal Palace',
-					homeGoals: 1,
 					matchDate: 1439731800000,
-					round: 2
+					round: 2,
+					location: {id: 0, name: 'Selhurst Park'}
 				}
 
 			],
 			roundDay: new Date(1439740800000)
 		});
 
-		new metal.ZsFootballRound({
+		new metal.Round({
 			elementClasses: 'table-striped table-bordered',
 			round: {
 				id: 301,
@@ -278,11 +470,24 @@
 					id: 7120,
 					attendance: 44102,
 					awayClub: 'AFC Bournemouth',
-					awayGoals: 0,
+					goals: {
+						awayGoals: {
+							firstHalf: [
+							],
+							secondHalf: []
+						},
+						homeGoals: {
+							firstHalf: [
+								{26: 'Benteke C. (Henderson J.)'}
+							],
+							secondHalf: [
+							]
+						}
+					},
 					homeClub: 'Liverpool FC',
-					homeGoals: 1,
 					matchDate: 1439841600000,
-					round: 2
+					round: 2,
+					location: {id: 6013, name: 'Anfield Road'}
 				}
 			],
 			roundDay: new Date(1439841600000)
