@@ -25,8 +25,7 @@
     "bootstrap": "^3.3.6",
     "metal-component": "metal/metal-component#master",
     "metal-list": "^1.0.0-rc.2",
-    "metal-soy": "metal/metal-soy#master",
-    "zsfootball-models": "^0.2.2"
+    "metal-soy": "metal/metal-soy#master"
   },
   "devDependencies": {
     "gulp": "^3.8.11",
