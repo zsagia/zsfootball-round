@@ -11807,6 +11807,10 @@ babelHelpers;
 			return babelHelpers.possibleConstructorReturn(this, _Model.apply(this, arguments));
 		}
 
+		Club.prototype.getShortTitle = function getShortTitle() {
+			return this.shortTitle ? this.shortTitle : this.title.subString(0, 2).toUpperCase();
+		};
+
 		return Club;
 	}(Model);
 
@@ -11814,7 +11818,12 @@ babelHelpers;
 		/**
    *
    */
-		title: {}
+		title: {},
+
+		/**
+   *
+   */
+		shortTitle: {}
 	};
 
 	this.metal.Club = Club;
@@ -12038,6 +12047,159 @@ babelHelpers;
 'use strict';
 
 (function () {
+	var Model = this.metal.Model;
+
+	var Person = function (_Model) {
+		babelHelpers.inherits(Person, _Model);
+
+		function Person() {
+			babelHelpers.classCallCheck(this, Person);
+			return babelHelpers.possibleConstructorReturn(this, _Model.apply(this, arguments));
+		}
+
+		Person.prototype.getFullName_ = function getFullName_() {
+			return this.firstName + ' ' + this.secondName;
+		};
+
+		return Person;
+	}(Model);
+
+	Person.STATE = {
+		/**
+   *
+   */
+		firstName: {},
+
+		fullName: {
+			valueFn: 'getFullName_'
+		},
+
+		/**
+   *
+   */
+		secondName: {},
+
+		/**
+   *
+   */
+		nickName: {},
+
+		/**
+   *
+   */
+		height: {},
+
+		/**
+   *
+   */
+		weight: {},
+
+		/**
+   *
+   */
+		birthDate: {},
+
+		/**
+   *
+   */
+		birthPlace: {},
+
+		/**
+   *
+   */
+		nationality: {}
+	};
+
+	this.metal.Person = Person;
+}).call(this);
+'use strict';
+
+(function () {
+	var Person = this.metal.Person;
+
+	var Player = function (_Person) {
+		babelHelpers.inherits(Player, _Person);
+
+		function Player() {
+			babelHelpers.classCallCheck(this, Player);
+			return babelHelpers.possibleConstructorReturn(this, _Person.apply(this, arguments));
+		}
+
+		return Player;
+	}(Person);
+
+	Player.STATE = {
+		/**
+   *
+   */
+		image: {},
+
+		/**
+   *
+   */
+		number: {},
+
+		/**
+   *
+   */
+		position: {}
+	};
+
+	this.metal.Player = Player;
+}).call(this);
+'use strict';
+
+(function () {
+	var Model = this.metal.Model;
+	var Player = this.metal.Player;
+	var core = this.metal.metal;
+
+	var Goal = function (_Model) {
+		babelHelpers.inherits(Goal, _Model);
+
+		function Goal() {
+			babelHelpers.classCallCheck(this, Goal);
+			return babelHelpers.possibleConstructorReturn(this, _Model.apply(this, arguments));
+		}
+
+		Goal.prototype.setPlayer_ = function setPlayer_(value) {
+			var player = {};
+
+			if (core.isObject(value)) {
+				player = new Player(value);
+			} else if (core.isString(value)) {
+				var names = value.split(' ');
+
+				player = new Player({ firstName: names[0], secondName: names[1] });
+			}
+
+			return player;
+		};
+
+		return Goal;
+	}(Model);
+
+	Goal.STATE = {
+		assist: {},
+
+		time: {
+			validator: core.isNumber
+		},
+
+		player: {
+			setter: 'setPlayer_'
+		},
+
+		ownGoal: {
+			value: false
+		}
+	};
+
+	this.metal.Goal = Goal;
+}).call(this);
+'use strict';
+
+(function () {
   var Model = this.metal.Model;
 
   var LineUp = function (_Model) {
@@ -12124,20 +12286,34 @@ babelHelpers;
 
 (function () {
 	var Model = this.metal.Model;
+	var Club = this.metal.Club;
+	var Goal = this.metal.Goal;
+	var core = this.metal.metal;
 
-	var Match = function (_Model) {
-		babelHelpers.inherits(Match, _Model);
+	var MatchModel = function (_Model) {
+		babelHelpers.inherits(MatchModel, _Model);
 
-		function Match() {
-			babelHelpers.classCallCheck(this, Match);
+		function MatchModel() {
+			babelHelpers.classCallCheck(this, MatchModel);
 			return babelHelpers.possibleConstructorReturn(this, _Model.apply(this, arguments));
 		}
+
+		MatchModel.prototype.compareByTime_ = function compareByTime_(goal1, goal2) {
+			if (goal1.time < goal2.time) {
+				return -1;
+			} else if (goal1.time > goal2.time) {
+				return 1;
+			}
+
+			return 0;
+		};
 
 		/**
    *
    */
 
-		Match.prototype.getAwayGoalList = function getAwayGoalList() {
+
+		MatchModel.prototype.getAwayGoalList = function getAwayGoalList() {
 			return this.goals.awayGoalList || [];
 		};
 
@@ -12146,7 +12322,7 @@ babelHelpers;
    */
 
 
-		Match.prototype.getAwayGoals = function getAwayGoals() {
+		MatchModel.prototype.getAwayGoals = function getAwayGoals() {
 			return this.goals.awayGoals || 0;
 		};
 
@@ -12155,7 +12331,7 @@ babelHelpers;
    */
 
 
-		Match.prototype.getHomeGoalList = function getHomeGoalList() {
+		MatchModel.prototype.getHomeGoalList = function getHomeGoalList() {
 			return this.goals.homeGoalList || [];
 		};
 
@@ -12164,14 +12340,92 @@ babelHelpers;
    */
 
 
-		Match.prototype.getHomeGoals = function getHomeGoals() {
+		MatchModel.prototype.getHomeGoals = function getHomeGoals() {
 			return this.goals.homeGoals || 0;
 		};
 
-		return Match;
+		/**
+   *
+   */
+
+
+		MatchModel.prototype.getHalfGoals_ = function getHalfGoals_(homeGoals, awayGoals) {
+			var goals = homeGoals.concat(awayGoals);
+
+			return goals.sort(this.compareByTime_);
+		};
+
+		MatchModel.prototype.firstHalfGoals_ = function firstHalfGoals_() {
+			return this.getHalfGoals_(this.goals.homeGoals.firstHalf, this.goals.awayGoals.firstHalf);
+		};
+
+		MatchModel.prototype.secondHalfGoals_ = function secondHalfGoals_() {
+			return this.getHalfGoals_(this.goals.homeGoals.secondHalf, this.goals.awayGoals.secondHalf);
+		};
+
+		/**
+  	 *
+  	 */
+
+
+		MatchModel.prototype.setClub_ = function setClub_(value) {
+			return core.isObject(value) ? new Club(value) : core.isString(value) ? new Club({ title: value }) : {};
+		};
+
+		MatchModel.prototype.createGoalsObject = function createGoalsObject(goalsValue, goalType) {
+			var goals = {};
+
+			if (core.isObject(goalsValue)) {
+				var firstHalf = goalsValue.firstHalf;
+				var secondHalf = goalsValue.secondHalf;
+
+				if (Array.isArray(firstHalf)) {
+					goals.firstHalf = [];
+
+					firstHalf.forEach(function (item) {
+						var goal = new Goal(item);
+
+						goal.goalType = goalType;
+
+						goals.firstHalf.push(goal);
+					});
+				} else {
+					goals.firstHalf = firstHalf;
+				}
+
+				if (Array.isArray(secondHalf)) {
+					goals.secondHalf = [];
+
+					secondHalf.forEach(function (item) {
+						var goal = new Goal(item);
+
+						goal.goalType = goalType;
+
+						goals.secondHalf.push(goal);
+					});
+				} else {
+					goals.firstHalf = firstHalf;
+				}
+			} else {
+				goals = goalsValue;
+			}
+
+			return goals;
+		};
+
+		MatchModel.prototype.setGoals_ = function setGoals_(value) {
+			var goals = {};
+
+			goals.awayGoals = this.createGoalsObject(value.awayGoals, 'awayGoal');
+			goals.homeGoals = this.createGoalsObject(value.homeGoals, 'homeGoal');
+
+			return goals;
+		};
+
+		return MatchModel;
 	}(Model);
 
-	Match.STATE = {
+	MatchModel.STATE = {
 		/**
    * The number of spectators who attended this match
    * @type {number}
@@ -12182,7 +12436,9 @@ babelHelpers;
    * It is a club instant, an id or a String which represent the away team
    * @type {Object|string|number}
    */
-		awayClub: {},
+		awayClub: {
+			setter: 'setClub_'
+		},
 
 		/**
    * It is true if the match has been finished
@@ -12199,14 +12455,24 @@ babelHelpers;
    * @default {}
    */
 		goals: {
-			value: {}
+			setter: 'setGoals_'
+		},
+
+		firstHalfGoals: {
+			valueFn: 'firstHalfGoals_'
+		},
+
+		secondHalfGoals: {
+			valueFn: 'secondHalfGoals_'
 		},
 
 		/**
    * It is a club instant, an id or a String which represent the home team
    * @type {Object|string|number}
    */
-		homeClub: {},
+		homeClub: {
+			setter: 'setClub_'
+		},
 
 		/**
    * The location where this match was/will be played off
@@ -12220,6 +12486,8 @@ babelHelpers;
    */
 		matchDate: {},
 
+		referee: {},
+
 		/**
    * A Round model instanse, an id
    * @type {Object|number|string}
@@ -12227,102 +12495,7 @@ babelHelpers;
 		round: {}
 	};
 
-	this.metal.Match = Match;
-}).call(this);
-'use strict';
-
-(function () {
-	var Model = this.metal.Model;
-
-	var Person = function (_Model) {
-		babelHelpers.inherits(Person, _Model);
-
-		function Person() {
-			babelHelpers.classCallCheck(this, Person);
-			return babelHelpers.possibleConstructorReturn(this, _Model.apply(this, arguments));
-		}
-
-		return Person;
-	}(Model);
-
-	Person.STATE = {
-		/**
-   *
-   */
-		firstName: {},
-
-		/**
-   *
-   */
-		secondName: {},
-
-		/**
-   *
-   */
-		nickName: {},
-
-		/**
-   *
-   */
-		height: {},
-
-		/**
-   *
-   */
-		weight: {},
-
-		/**
-   *
-   */
-		birthDate: {},
-
-		/**
-   *
-   */
-		birthPlace: {},
-
-		/**
-   *
-   */
-		nationality: {}
-	};
-
-	this.metal.Person = Person;
-}).call(this);
-'use strict';
-
-(function () {
-	var Person = this.metal.Person;
-
-	var Player = function (_Person) {
-		babelHelpers.inherits(Player, _Person);
-
-		function Player() {
-			babelHelpers.classCallCheck(this, Player);
-			return babelHelpers.possibleConstructorReturn(this, _Person.apply(this, arguments));
-		}
-
-		return Player;
-	}(Person);
-
-	Player.STATE = {
-		/**
-   *
-   */
-		image: {},
-
-		/**
-   *
-   */
-		number: {},
-
-		/**
-   *
-   */
-		position: {}
-	};
-
-	this.metal.Player = Player;
+	this.metal.MatchModel = MatchModel;
 }).call(this);
 'use strict';
 
@@ -12485,10 +12658,11 @@ babelHelpers;
 (function () {
 	var Club = this.metal.Club;
 	var Competition = this.metal.Competition;
+	var Goal = this.metal.Goal;
 	var LineUp = this.metal.LineUp;
 	var LineUpMember = this.metal.LineUpMember;
 	var Location = this.metal.Location;
-	var Match = this.metal.Match;
+	var MatchModel = this.metal.MatchModel;
 	var Model = this.metal.Model;
 	var Person = this.metal.Person;
 	var Player = this.metal.Player;
@@ -12503,10 +12677,11 @@ babelHelpers;
 	this.metalNamed.models = this.metalNamed.models || {};
 	this.metalNamed.models.Club = Club;
 	this.metalNamed.models.Competition = Competition;
+	this.metalNamed.models.Goal = Goal;
 	this.metalNamed.models.LineUp = LineUp;
 	this.metalNamed.models.LineUpMember = LineUpMember;
 	this.metalNamed.models.Location = Location;
-	this.metalNamed.models.Match = Match;
+	this.metalNamed.models.MatchModel = MatchModel;
 	this.metalNamed.models.Model = Model;
 	this.metalNamed.models.ModelUtil = ModelUtil;
 	this.metalNamed.models.Person = Person;
@@ -12522,7 +12697,7 @@ babelHelpers;
 
 (function () {
   /* jshint ignore:start */
-  var Component = this.metal.Component;
+  var Component = this.metal.component;
   var Soy = this.metal.Soy;
 
   var templates;
@@ -12587,21 +12762,23 @@ babelHelpers;
      */
     function $renderRowView_(opt_data, opt_ignored, opt_ijData) {
       ie_open('table', null, null, 'class', 'zsfootball-match' + (opt_data.elementClasses ? ' ' + opt_data.elementClasses : ''), 'data-onclick', 'onRowClickHandler');
-      var goals__soy18 = opt_data.match.goals;
+      var goals__soy20 = opt_data.match.goals;
       ie_open('tr', null, null, 'class', 'zsfootball-match-row');
       ie_open('td', null, null, 'class', 'match-date');
       itext((goog.asserts.assert(opt_data.localHourMinute != null), opt_data.localHourMinute));
       ie_close('td');
       ie_open('td', null, null, 'class', 'home-club');
-      itext((goog.asserts.assert(opt_data.match.homeClub != null), opt_data.match.homeClub));
+      itext((goog.asserts.assert(opt_data.match.homeClub.title != null), opt_data.match.homeClub.title));
       ie_close('td');
       ie_open('td', null, null, 'class', 'result');
-      itext((goog.asserts.assert(goals__soy18.homeGoals.firstHalf.length + goals__soy18.homeGoals.secondHalf.length != null), goals__soy18.homeGoals.firstHalf.length + goals__soy18.homeGoals.secondHalf.length));
+      ie_open('span');
+      itext((goog.asserts.assert(goals__soy20.homeGoals.firstHalf.length + goals__soy20.homeGoals.secondHalf.length != null), goals__soy20.homeGoals.firstHalf.length + goals__soy20.homeGoals.secondHalf.length));
       itext(' - ');
-      itext((goog.asserts.assert(goals__soy18.awayGoals.firstHalf.length + goals__soy18.awayGoals.secondHalf.length != null), goals__soy18.awayGoals.firstHalf.length + goals__soy18.awayGoals.secondHalf.length));
+      itext((goog.asserts.assert(goals__soy20.awayGoals.firstHalf.length + goals__soy20.awayGoals.secondHalf.length != null), goals__soy20.awayGoals.firstHalf.length + goals__soy20.awayGoals.secondHalf.length));
+      ie_close('span');
       ie_close('td');
       ie_open('td', null, null, 'class', 'away-club');
-      itext((goog.asserts.assert(opt_data.match.awayClub != null), opt_data.match.awayClub));
+      itext((goog.asserts.assert(opt_data.match.awayClub.title != null), opt_data.match.awayClub.title));
       ie_close('td');
       ie_open('td', null, null, 'class', 'location');
       itext((goog.asserts.assert(opt_data.match.location.name != null), opt_data.match.location.name));
@@ -12628,31 +12805,40 @@ babelHelpers;
      */
     function $renderDetails_(opt_data, opt_ignored, opt_ijData) {
       ie_open('table');
-      var goals__soy37 = opt_data.match.goals;
-      ie_open('tr', null, null, 'class', 'first-half');
-      ie_open('td', null, null, 'class', 'first-half', 'colspan', '3');
+      ie_open('tr', null, null, 'class', 'header');
+      ie_open('td', null, null, 'colspan', '4');
+      ie_open('table');
+      ie_open('tr');
+      ie_open('td', null, null, 'class', 'date');
+      itext((goog.asserts.assert(opt_data.localeDate != null), opt_data.localeDate));
+      ie_close('td');
+      ie_open('td', null, null, 'class', 'referee');
+      itext((goog.asserts.assert(opt_data.match.referee != null), opt_data.match.referee));
+      ie_close('td');
+      ie_open('td', null, null, 'class', 'attendance');
+      itext('Attendance: ');
+      itext((goog.asserts.assert(opt_data.match.attendance != null), opt_data.match.attendance));
+      ie_close('td');
+      ie_open('td', null, null, 'class', 'location');
+      itext((goog.asserts.assert(opt_data.match.location.city != null), opt_data.match.location.city));
+      ie_close('td');
+      ie_close('tr');
+      ie_close('table');
+      ie_close('td');
+      ie_close('tr');
+      var goals__soy48 = opt_data.match.goals;
+      ie_open('tr', null, null, 'class', 'first-half half');
+      ie_open('td', null, null, 'colspan', '5');
       itext('1. half');
       ie_close('td');
       ie_close('tr');
-      ie_open('tr', null, null, 'class', 'first-half');
-      ie_open('td', null, null, 'class', 'first-half');
-      itext((goog.asserts.assert(goals__soy37.homeGoals.firstHalf.length != null), goals__soy37.homeGoals.firstHalf.length));
-      itext(' - ');
-      itext((goog.asserts.assert(goals__soy37.awayGoals.firstHalf.length != null), goals__soy37.awayGoals.firstHalf.length));
-      ie_close('td');
-      ie_close('tr');
-      ie_open('tr', null, null, 'class', 'first-half', 'colspan', '3');
-      ie_open('td', null, null, 'class', 'first-half');
+      $renderGoals_({ halfGoals: opt_data.match.firstHalfGoals, homeGoals: goals__soy48.homeGoals.firstHalf.length, awayGoals: goals__soy48.awayGoals.firstHalf.length }, null, opt_ijData);
+      ie_open('tr', null, null, 'class', 'second-half half');
+      ie_open('td', null, null, 'colspan', '5');
       itext('2. half');
       ie_close('td');
       ie_close('tr');
-      ie_open('tr', null, null, 'class', 'second-half');
-      ie_open('td', null, null, 'class', 'first-half');
-      itext((goog.asserts.assert(goals__soy37.homeGoals.secondHalf.length != null), goals__soy37.homeGoals.secondHalf.length));
-      itext(' - ');
-      itext((goog.asserts.assert(goals__soy37.awayGoals.secondHalf.length != null), goals__soy37.awayGoals.secondHalf.length));
-      ie_close('td');
-      ie_close('tr');
+      $renderGoals_({ halfGoals: opt_data.match.secondHalfGoals, homeGoals: goals__soy48.homeGoals.secondHalf.length, awayGoals: goals__soy48.awayGoals.secondHalf.length }, null, opt_ijData);
       ie_close('table');
     }
     exports.renderDetails_ = $renderDetails_;
@@ -12660,12 +12846,76 @@ babelHelpers;
       $renderDetails_.soyTemplateName = 'Match.renderDetails_';
     }
 
-    exports.render.params = ["match", "localHourMinute", "viewType", "elementClasses"];
-    exports.render.types = { "match": "any", "localHourMinute": "any", "viewType": "any", "elementClasses": "any" };
-    exports.renderRowView_.params = ["elementClasses", "localHourMinute", "match"];
-    exports.renderRowView_.types = { "elementClasses": "any", "localHourMinute": "any", "match": "any" };
-    exports.renderDetails_.params = ["match"];
-    exports.renderDetails_.types = { "match": "any" };
+    /**
+     * @param {Object<string, *>=} opt_data
+     * @param {(null|undefined)=} opt_ignored
+     * @param {Object<string, *>=} opt_ijData
+     * @return {void}
+     * @suppress {checkTypes}
+     */
+    function $renderGoals_(opt_data, opt_ignored, opt_ijData) {
+      var rowLength__soy61 = opt_data.halfGoals.length;
+      var goalList69 = opt_data.halfGoals;
+      var goalListLen69 = goalList69.length;
+      for (var goalIndex69 = 0; goalIndex69 < goalListLen69; goalIndex69++) {
+        var goalData69 = goalList69[goalIndex69];
+        var columnIndex__soy62 = goalIndex69;
+        $renderGoal_({ columnIndex: columnIndex__soy62, goal: goalData69, homeGoals: opt_data.homeGoals, awayGoals: opt_data.awayGoals, rowLength: rowLength__soy61 }, null, opt_ijData);
+      }
+    }
+    exports.renderGoals_ = $renderGoals_;
+    if (goog.DEBUG) {
+      $renderGoals_.soyTemplateName = 'Match.renderGoals_';
+    }
+
+    /**
+     * @param {Object<string, *>=} opt_data
+     * @param {(null|undefined)=} opt_ignored
+     * @param {Object<string, *>=} opt_ijData
+     * @return {void}
+     * @suppress {checkTypes}
+     */
+    function $renderGoal_(opt_data, opt_ignored, opt_ijData) {
+      ie_open('tr');
+      ie_open('td', null, null, 'colspan', '2');
+      if (opt_data.goal.goalType == 'homeGoal') {
+        itext((goog.asserts.assert(opt_data.goal.time != null), opt_data.goal.time));
+        itext('\' ');
+        itext((goog.asserts.assert(opt_data.goal.player.fullName != null), opt_data.goal.player.fullName));
+      }
+      ie_close('td');
+      if (opt_data.columnIndex == 0) {
+        ie_open('td', null, null, 'rowspan', opt_data.rowLength);
+        itext((goog.asserts.assert(opt_data.homeGoals != null), opt_data.homeGoals));
+        itext(' - ');
+        itext((goog.asserts.assert(opt_data.awayGoals != null), opt_data.awayGoals));
+        itext(' ');
+        ie_close('td');
+      }
+      ie_open('td', null, null, 'colspan', '2');
+      if (opt_data.goal.goalType == 'awayGoal') {
+        itext((goog.asserts.assert(opt_data.goal.time != null), opt_data.goal.time));
+        itext('\' ');
+        itext((goog.asserts.assert(opt_data.goal.player.fullName != null), opt_data.goal.player.fullName));
+      }
+      ie_close('td');
+      ie_close('tr');
+    }
+    exports.renderGoal_ = $renderGoal_;
+    if (goog.DEBUG) {
+      $renderGoal_.soyTemplateName = 'Match.renderGoal_';
+    }
+
+    exports.render.params = ["match", "localeDate", "localHourMinute", "viewType", "elementClasses"];
+    exports.render.types = { "match": "any", "localeDate": "any", "localHourMinute": "any", "viewType": "any", "elementClasses": "any" };
+    exports.renderRowView_.params = ["elementClasses", "localeDate", "localHourMinute", "match"];
+    exports.renderRowView_.types = { "elementClasses": "any", "localeDate": "any", "localHourMinute": "any", "match": "any" };
+    exports.renderDetails_.params = ["localeDate", "match"];
+    exports.renderDetails_.types = { "localeDate": "any", "match": "any" };
+    exports.renderGoals_.params = ["halfGoals", "awayGoals", "homeGoals"];
+    exports.renderGoals_.types = { "halfGoals": "any", "awayGoals": "any", "homeGoals": "any" };
+    exports.renderGoal_.params = ["columnIndex", "goal", "homeGoals", "awayGoals", "rowLength"];
+    exports.renderGoal_.types = { "columnIndex": "any", "goal": "any", "homeGoals": "any", "awayGoals": "any", "rowLength": "any" };
     templates = exports;
     return exports;
   });
@@ -12695,7 +12945,7 @@ babelHelpers;
 	var dom = this.metalNamed.dom.dom;
 	var Component = this.metal.component;
 	var Soy = this.metal.Soy;
-	var MatchModel = this.metalNamed.models.Match;
+	var MatchModel = this.metalNamed.models.MatchModel;
 	var templates = this.metal.Match;
 
 	var Match = function (_Component) {
@@ -12711,9 +12961,11 @@ babelHelpers;
    */
 
 		Match.prototype.getLocalHourMinute_ = function getLocalHourMinute_() {
-			var matchDate = new Date(this.match.matchDate);
+			return new Date(this.match.matchDate).toLocaleTimeString();
+		};
 
-			return matchDate.getHours() + ':' + (matchDate.getMinutes() === 0 ? '00' : matchDate.getMinutes());
+		Match.prototype.toLocaleDateString_ = function toLocaleDateString_() {
+			return new Date(this.match.matchDate).toLocaleDateString();
 		};
 
 		/**
@@ -12743,6 +12995,10 @@ babelHelpers;
 	Soy.register(Match, templates);
 
 	Match.STATE = {
+		localeDate: {
+			valueFn: 'toLocaleDateString_'
+		},
+
 		/**
    * It is a helper state for 'getLocalHourMinute_' method
    * @type {function()}
