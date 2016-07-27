@@ -33,7 +33,7 @@ class Round extends Component  {
 		var matches = [];
 
 		for(let i = 0; i < values.length; i++) {
-			matches.push(new Match({match:values[i]}, this.element.children[1].children[i].children[0])); 
+			matches.push(new Match({match:values[i], viewType: this.viewType}, this.element.children[1].children[i].children[0])); 
 		}
 
 	 	return matches;
@@ -61,6 +61,9 @@ Round.STATE = {
 	 * A Match component array
 	 */
 	matches: {
+	},
+
+	viewType: {
 	},
 
 	/**
